@@ -2,3 +2,8 @@
 __pycache__/
 *.pyc
 apikey.json
+
+# LaTeX pomožne datoteke predloga teme
+predlog-teme/*.aux
+predlog-teme/*.log
+predlog-teme/*.out

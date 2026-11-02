@@ -1,0 +1,89 @@
+% Prijava teme seminarske naloge -- NPMP 2026/2027, kvantno procesiranje
+% Skupina 20. Prevajanje: pdflatex predlog_teme.tex
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovene]{babel}
+\usepackage{mathptmx}
+\usepackage{courier}
+\usepackage[a4paper,margin=1.7cm,top=1.4cm,bottom=1.4cm]{geometry}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\pagestyle{empty}
+\sloppy
+
+\begin{document}
+
+{\large\textbf{Prijava teme seminarske naloge -- NPMP 2026/27, kvantno procesiranje}}\\
+\textbf{Skupina 20:} [Ime Priimek], [Ime Priimek], [Ime Priimek], [Ime Priimek] \hfill Ljubljana, [datum oddaje]
+
+\medskip
+\textbf{Naslov:} \emph{Meja prepletenosti na procesorju IBM: koliko kubitov lahko zares prepletemo v stanje GHZ?}
+
+\textbf{Raziskovalno vprašanje.} Koliko kubitov lahko procesor IBM Heron (ibm\_fez, 156 kubitov) pripravi v stanje GHZ
+$\ket{\mathrm{GHZ}_N}=\tfrac{1}{\sqrt2}(\ket{0}^{\otimes N}+\ket{1}^{\otimes N})$ z zvestobo $F>0{,}5$
+(zadosten pogoj za \emph{pravo} večdelno prepletenost vseh $N$ kubitov) in za koliko kubitov to mejo $N_{\max}$
+premakneta (a)~zasnova vezja (linearna veriga proti drevesu z majhno globino) ter (b)~dinamično razklapljanje (DD) in ublažitev napak branja?
+
+\textbf{Hipoteza.} Linearna veriga brez ublažitve doseže $N_{\max}\approx 15$--$20$, ker globina raste linearno z $N$ in mirujoči kubiti
+dekoherirajo. Drevo, prilagojeno povezavam čipa, ima globino $\approx\!\sqrt N$ namesto $N$ in mejo vsaj podvoji;
+DD + ublažitev branja dodata še vsaj 20~\%. Pričakujemo $N_{\max}\approx 35$--$50$ za najboljšo kombinacijo.
+
+\textbf{Metrike.}
+\begin{itemize}
+\item Zvestoba $F=(P+C)/2$, kjer je $P=p(0\dots0)+p(1\dots1)$ populacija, $C$ pa amplituda paritetnih oscilacij
+      $\expval{\Pi(\phi)}=C\cos(N\phi)$, izmerjena po rotaciji vseh kubitov v bazo $\cos\phi\,X+\sin\phi\,Y$.
+      Negotovost z zankanjem (\emph{bootstrap}) po posnetkih; $F>0{,}5$ zahtevamo z 2$\sigma$.
+\item $N_{\max}$ za vsako od 4 konfiguracij; prirastek $\Delta N_{\max}$ zaradi zasnove vezja oz.\ ublažitve.
+\item Lastnosti vezja pred prevajanjem in po njem: globina, število dvokubitnih vrat (CZ), trajanje vezja.
+\end{itemize}
+
+\textbf{Načrt poskusov.}
+\begin{enumerate}
+\item \emph{Vezja:} linearna veriga po najdaljši poti v grafu povezav; drevo z iskanjem v širino (BFS) iz osrednjega kubita
+      z najboljšimi kalibracijami. Obe brez dodanih SWAP vrat, $N\in\{5,10,15,20,25,30,40,50\}$.
+\item \emph{Idealni simulator} (Qiskit Aer): preverba $F=1$. \emph{Šumni model} FakeFez: celotna analiza in napoved $N_{\max}$.
+\item \emph{Pilotni zagon} na ibm\_fez (1 posel, 20 vezij, $\approx 9$~s): preverba časovnega modela in DD sekvence (XY4).
+\item \emph{Glavni zagon:} 4 konfiguracije (veriga/drevo $\times$ brez/z DD) $\times$ 8 velikosti $\times$ 17 vezij
+      (1 populacijsko + 16 faz $\phi$) + 32 kalibracijskih vezij za ublažitev branja (M3), 1000 posnetkov na vezje.
+\item Primerjava: simulator / šumni model / procesor ter z objavljenimi rezultati (27~kubitov, Mooney idr.\ 2021; 120~kubitov, IBM 2025).
+\end{enumerate}
+
+\textbf{Ocena procesorskega časa.} Izmerjeno 2.\,11.\,2026: 5-kubitni GHZ, 1 vezje $\times$ 1000 posnetkov na ibm\_fez
+(job ID \texttt{dbk48fl6p51s73clupeg}, $P=0{,}855$) je porabil \textbf{2~s} (ocena IBM 2,27~s). To se ujema z modelom IBM
+\[ t \approx 2\,\mathrm{s}\cdot(\text{št.\ poslov}) + 0{,}35\,\mathrm{ms}\cdot(\text{št.\ vezij}\times\text{št.\ posnetkov}), \]
+zato vezja združujemo v čim manj poslov.
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+Del poskusa & vezja & posli & ocena časa \\
+\midrule
+pilotni zagon & 20 & 1 & 9~s \\
+glavni zagon (4 konfiguracije $\times$ 8 velikosti) & 576 & 8 & 218~s \\
+ponovitev najboljše konfiguracije na ibm\_kingston & 144 & 2 & 54~s \\
+\midrule
+\textbf{skupaj} & \textbf{740} & \textbf{11} & \textbf{$\approx$\,280~s} \\
+\bottomrule
+\end{tabular}
+\end{center}
+Na voljo imamo 598~s (Open Plan: 600~s v drsečem 28-dnevnem oknu), torej ostane $\approx$\,50~\% rezerve za ponovne zagone.
+Če pilot pokaže višjo porabo, zmanjšamo število faz s 16 na 8 ali posnetke na 500.
+
+\textbf{Orodja.} Python~3, Qiskit~2.6, Qiskit Aer 0.18 (FakeFez), qiskit-ibm-runtime 0.51 (SamplerV2, DD), mthree (M3), 
+NumPy/SciPy (prilagajanje, \emph{bootstrap}), Matplotlib; IBM Quantum Open Plan; \LaTeX{} (predloga zbornika); GitHub.\par
+
+\textbf{Razdelitev dela.}
+\begin{itemize}
+\item \textbf{[Član 1]} -- gradnja vezij (veriga, BFS drevo) in izbira kubitov na čipu; poglavje Metode.
+\item \textbf{[Član 2]} -- simulacije (idealni, FakeFez), pilotni in glavni zagon na IBM, beleženje job ID in porabe časa.
+\item \textbf{[Član 3]} -- analiza: izračun $P$, $C$, $F$, \emph{bootstrap}, ublažitev branja (M3), grafi; poglavje Rezultati.
+\item \textbf{[Član 4]} -- pregled literature, uvod, razprava in primerjava z objavami, prosojnice; urejanje repozitorija (README).
+\end{itemize}
+
+\end{document}
