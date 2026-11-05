@@ -1,0 +1,897 @@
+{
+ "cas": "2026-11-04T17:43:21+00:00",
+ "opis": "ibm_fez, 5-kubitna veriga, P (surovo)",
+ "razlicice": {
+  "python": "3.13.12",
+  "qiskit": "2.6.1",
+  "qiskit_aer": "0.18.2",
+  "qiskit_ibm_runtime": "0.51.0"
+ },
+ "poskusi": [
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 1334
+   },
+   "seed": 11,
+   "postavitev": [
+    141,
+    142,
+    143,
+    136,
+    123
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.948,
+    "C": 0.9154792345803477,
+    "F": 0.9317396172901738,
+    "sigma_P": 0.007015014407374958,
+    "sigma_C": 0.006911708268816859,
+    "sigma_F": 0.005052458005630424,
+    "napaka_branja_povprecje": 0.005675000000000004
+   },
+   "ublazeno": {
+    "P": 0.9754829520872647,
+    "C": 0.9692758974766694,
+    "F": 0.972379424781967,
+    "sigma_P": 0.007571730854053551,
+    "sigma_C": 0.008158657595168073,
+    "sigma_F": 0.006021453941573708,
+    "napaka_branja_povprecje": 0.005675000000000004
+   },
+   "cas_simulacije_s": 5.1,
+   "stetja_populacija": {
+    "00000": 476,
+    "11111": 472,
+    "11011": 4,
+    "11101": 13,
+    "11100": 3,
+    "10000": 3,
+    "01111": 5,
+    "00010": 1,
+    "11010": 1,
+    "11110": 11,
+    "00111": 1,
+    "10111": 3,
+    "00011": 2,
+    "00001": 1,
+    "11000": 1,
+    "01101": 1,
+    "10101": 1,
+    "01000": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    104,
+    103,
+    96,
+    83,
+    84
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.878,
+    "C": 0.8107694892833639,
+    "F": 0.8443847446416819,
+    "sigma_P": 0.010533987751995154,
+    "sigma_C": 0.01400086230468812,
+    "sigma_F": 0.008315866921244117,
+    "napaka_branja_povprecje": 0.016924999999999992
+   },
+   "ublazeno": {
+    "P": 0.9572771583885081,
+    "C": 0.9702378767172579,
+    "F": 0.963757517552883,
+    "sigma_P": 0.01230945831073534,
+    "sigma_C": 0.019052482563514574,
+    "sigma_F": 0.011470352210683446,
+    "napaka_branja_povprecje": 0.016924999999999992
+   },
+   "cas_simulacije_s": 2.6,
+   "stetja_populacija": {
+    "00000": 454,
+    "11111": 424,
+    "00001": 4,
+    "11011": 4,
+    "11101": 10,
+    "10111": 44,
+    "00111": 6,
+    "01000": 27,
+    "01111": 4,
+    "11110": 8,
+    "00011": 5,
+    "10000": 1,
+    "00010": 2,
+    "11000": 2,
+    "10100": 1,
+    "11100": 3,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    73,
+    74,
+    75,
+    59,
+    55
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.911,
+    "C": 0.8723715048427996,
+    "F": 0.8916857524213998,
+    "sigma_P": 0.011218497844076598,
+    "sigma_C": 0.015822575731411364,
+    "sigma_F": 0.009116318546116638,
+    "napaka_branja_povprecje": 0.009000000000000005
+   },
+   "ublazeno": {
+    "P": 0.9531010580241227,
+    "C": 0.9565167300921528,
+    "F": 0.9548088940581377,
+    "sigma_P": 0.01260934389618276,
+    "sigma_C": 0.018255134633596876,
+    "sigma_F": 0.011066662206147583,
+    "napaka_branja_povprecje": 0.009000000000000005
+   },
+   "cas_simulacije_s": 2.5,
+   "stetja_populacija": {
+    "00000": 463,
+    "11111": 448,
+    "00011": 6,
+    "11011": 5,
+    "11101": 13,
+    "01111": 15,
+    "00010": 2,
+    "11110": 17,
+    "11100": 10,
+    "01000": 3,
+    "10111": 3,
+    "00001": 6,
+    "00100": 5,
+    "11000": 1,
+    "00111": 1,
+    "01101": 1,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    98,
+    91,
+    92,
+    93,
+    94
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.879,
+    "C": 0.7567832873704232,
+    "F": 0.8178916436852116,
+    "sigma_P": 0.011030588268583896,
+    "sigma_C": 0.018123429488274823,
+    "sigma_F": 0.01110052733775563,
+    "napaka_branja_povprecje": 0.01957499999999999
+   },
+   "ublazeno": {
+    "P": 0.9709598444601348,
+    "C": 0.9264838263896519,
+    "F": 0.9487218354248934,
+    "sigma_P": 0.0127494914221128,
+    "sigma_C": 0.023620791962472826,
+    "sigma_F": 0.014261343222239186,
+    "napaka_branja_povprecje": 0.01957499999999999
+   },
+   "cas_simulacije_s": 2.5,
+   "stetja_populacija": {
+    "00000": 447,
+    "11111": 432,
+    "00011": 3,
+    "11011": 7,
+    "11101": 19,
+    "10111": 28,
+    "01111": 9,
+    "00010": 6,
+    "00111": 4,
+    "10101": 2,
+    "10000": 10,
+    "01000": 19,
+    "11110": 4,
+    "10110": 2,
+    "10100": 1,
+    "00100": 3,
+    "00001": 2,
+    "10011": 1,
+    "00101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    43,
+    42,
+    41,
+    36,
+    21
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.869,
+    "C": 0.7849383151852252,
+    "F": 0.8269691575926126,
+    "sigma_P": 0.010919819090973623,
+    "sigma_C": 0.015461963403196138,
+    "sigma_F": 0.010391355762023395,
+    "napaka_branja_povprecje": 0.019649999999999994
+   },
+   "ublazeno": {
+    "P": 0.9595929892877322,
+    "C": 0.9616984181465038,
+    "F": 0.960645703717118,
+    "sigma_P": 0.01354969235184532,
+    "sigma_C": 0.021181901303990565,
+    "sigma_F": 0.014413103022434693,
+    "napaka_branja_povprecje": 0.019649999999999994
+   },
+   "cas_simulacije_s": 2.8,
+   "stetja_populacija": {
+    "00000": 440,
+    "11111": 429,
+    "00001": 22,
+    "11011": 30,
+    "11110": 18,
+    "11101": 14,
+    "00100": 19,
+    "01111": 8,
+    "00010": 5,
+    "10100": 1,
+    "01110": 1,
+    "00111": 3,
+    "11010": 1,
+    "10000": 2,
+    "10111": 2,
+    "01000": 1,
+    "11000": 1,
+    "11100": 1,
+    "00011": 1,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    63,
+    56,
+    43,
+    42,
+    41
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.875,
+    "C": 0.7649091713478753,
+    "F": 0.8199545856739376,
+    "sigma_P": 0.011952286093343948,
+    "sigma_C": 0.01617417894159111,
+    "sigma_F": 0.010994003037774883,
+    "napaka_branja_povprecje": 0.019925000000000016
+   },
+   "ublazeno": {
+    "P": 0.9683509350395701,
+    "C": 0.9399685630626167,
+    "F": 0.9541597490510934,
+    "sigma_P": 0.013752658870919867,
+    "sigma_C": 0.01951440440933619,
+    "sigma_F": 0.013102142075065836,
+    "napaka_branja_povprecje": 0.019925000000000016
+   },
+   "cas_simulacije_s": 2.5,
+   "stetja_populacija": {
+    "00000": 434,
+    "11111": 441,
+    "11011": 19,
+    "00001": 9,
+    "01000": 6,
+    "11101": 10,
+    "01111": 21,
+    "00100": 14,
+    "11110": 10,
+    "10000": 17,
+    "01101": 1,
+    "01100": 1,
+    "00010": 2,
+    "11100": 4,
+    "10111": 5,
+    "10001": 1,
+    "10100": 1,
+    "11000": 1,
+    "00011": 1,
+    "00111": 2
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    0,
+    1,
+    2,
+    3,
+    16
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.917,
+    "C": 0.8497226228596306,
+    "F": 0.8833613114298153,
+    "sigma_P": 0.006191534708036159,
+    "sigma_C": 0.01711776245438876,
+    "sigma_F": 0.009383334402905282,
+    "napaka_branja_povprecje": 0.011499999999999993
+   },
+   "ublazeno": {
+    "P": 0.9713656013039043,
+    "C": 0.9540977491199192,
+    "F": 0.9627316752119117,
+    "sigma_P": 0.007355870740061079,
+    "sigma_C": 0.019200880949833493,
+    "sigma_F": 0.010597562728353313,
+    "napaka_branja_povprecje": 0.011499999999999993
+   },
+   "cas_simulacije_s": 2.4,
+   "stetja_populacija": {
+    "00000": 470,
+    "11111": 447,
+    "10000": 4,
+    "00001": 9,
+    "11101": 15,
+    "11011": 5,
+    "01111": 10,
+    "00010": 2,
+    "11110": 15,
+    "10111": 13,
+    "01000": 4,
+    "00011": 2,
+    "11000": 1,
+    "00111": 1,
+    "10011": 1,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    101,
+    102,
+    103,
+    96,
+    83
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.036
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.06
+   },
+   "surovo": {
+    "P": 0.842,
+    "C": 0.6782166667439009,
+    "F": 0.7601083333719505,
+    "sigma_P": 0.01136412184491713,
+    "sigma_C": 0.01872335940903283,
+    "sigma_F": 0.010212299332767369,
+    "napaka_branja_povprecje": 0.028099999999999993
+   },
+   "ublazeno": {
+    "P": 0.9729468876191826,
+    "C": 0.9146010174271247,
+    "F": 0.9437739525231537,
+    "sigma_P": 0.01570144751840067,
+    "sigma_C": 0.026534773967916477,
+    "sigma_F": 0.01566826249918764,
+    "napaka_branja_povprecje": 0.028099999999999993
+   },
+   "cas_simulacije_s": 2.5,
+   "stetja_populacija": {
+    "00000": 423,
+    "11111": 419,
+    "00001": 30,
+    "11110": 27,
+    "11011": 5,
+    "11000": 2,
+    "11101": 15,
+    "01111": 34,
+    "10000": 28,
+    "01101": 1,
+    "11100": 4,
+    "01110": 1,
+    "00010": 1,
+    "01100": 1,
+    "00111": 2,
+    "00011": 1,
+    "11010": 1,
+    "10111": 3,
+    "10001": 1,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    44,
+    43,
+    56,
+    63,
+    62
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.909,
+    "C": 0.8419946089472048,
+    "F": 0.8754973044736024,
+    "sigma_P": 0.00926516407335146,
+    "sigma_C": 0.014044222560828453,
+    "sigma_F": 0.008910868734598057,
+    "napaka_branja_povprecje": 0.011874999999999997
+   },
+   "ublazeno": {
+    "P": 0.9647532733974358,
+    "C": 0.9499946321556416,
+    "F": 0.9573739527765387,
+    "sigma_P": 0.009937836161765787,
+    "sigma_C": 0.016123315555550532,
+    "sigma_F": 0.010053048275558744,
+    "napaka_branja_povprecje": 0.011874999999999997
+   },
+   "cas_simulacije_s": 3.0,
+   "stetja_populacija": {
+    "00000": 458,
+    "11111": 451,
+    "10000": 6,
+    "11011": 3,
+    "11000": 4,
+    "11101": 29,
+    "00010": 13,
+    "00111": 7,
+    "10111": 6,
+    "01000": 6,
+    "01111": 6,
+    "11110": 5,
+    "11010": 1,
+    "00110": 1,
+    "00001": 1,
+    "00100": 1,
+    "00011": 1,
+    "10101": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    27,
+    26,
+    25,
+    37,
+    45
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.923,
+    "C": 0.8638515753223427,
+    "F": 0.8934257876611713,
+    "sigma_P": 0.009015293129126838,
+    "sigma_C": 0.014840171628095932,
+    "sigma_F": 0.008086804876775862,
+    "napaka_branja_povprecje": 0.010724999999999995
+   },
+   "ublazeno": {
+    "P": 0.9743375397123974,
+    "C": 0.9623358745782812,
+    "F": 0.9683367071453393,
+    "sigma_P": 0.010644915825248494,
+    "sigma_C": 0.01737426209255735,
+    "sigma_F": 0.010305317891139872,
+    "napaka_branja_povprecje": 0.010724999999999995
+   },
+   "cas_simulacije_s": 2.9,
+   "stetja_populacija": {
+    "00000": 458,
+    "11111": 465,
+    "11110": 13,
+    "11011": 9,
+    "11101": 14,
+    "01111": 7,
+    "00010": 5,
+    "10000": 7,
+    "01000": 7,
+    "00001": 3,
+    "00100": 3,
+    "01101": 1,
+    "00011": 1,
+    "10111": 3,
+    "00111": 2,
+    "10101": 1,
+    "11100": 1
+   }
+  },
+  {
+   "backend": "FakeFez",
+   "simulator": "Aer + šumni model FakeFez",
+   "zasnova": "veriga",
+   "n": 5,
+   "metoda": "pariteta",
+   "dd": false,
+   "faze": "2N+2 (DFT)",
+   "stevilo_faz": 12,
+   "posnetki": {
+    "kalibracija": 4000,
+    "populacija": 1000,
+    "na_fazo": 334
+   },
+   "seed": 11,
+   "postavitev": [
+    131,
+    130,
+    129,
+    128,
+    127
+   ],
+   "lastnosti_pred": {
+    "kubiti": 5,
+    "globina": 6,
+    "dvokubitna": 4,
+    "trajanje_us": null
+   },
+   "lastnosti_po": {
+    "kubiti": 5,
+    "globina": 20,
+    "dvokubitna": 4,
+    "trajanje_us": 2.0160000000000005
+   },
+   "lastnosti_po_fazno": {
+    "kubiti": 5,
+    "globina": 23,
+    "dvokubitna": 4,
+    "trajanje_us": 2.04
+   },
+   "surovo": {
+    "P": 0.889,
+    "C": 0.793425676807712,
+    "F": 0.841212838403856,
+    "sigma_P": 0.009111575951860948,
+    "sigma_C": 0.014906310704291778,
+    "sigma_F": 0.008247928683890843,
+    "napaka_branja_povprecje": 0.019299999999999998
+   },
+   "ublazeno": {
+    "P": 0.9811210389361713,
+    "C": 0.9688228254561659,
+    "F": 0.9749719321961686,
+    "sigma_P": 0.011442673481536776,
+    "sigma_C": 0.019084743954135005,
+    "sigma_F": 0.01140402423458118,
+    "napaka_branja_povprecje": 0.019299999999999998
+   },
+   "cas_simulacije_s": 2.6,
+   "stetja_populacija": {
+    "00000": 448,
+    "11111": 441,
+    "00001": 30,
+    "00010": 1,
+    "11110": 23,
+    "11011": 13,
+    "11101": 13,
+    "01011": 1,
+    "10000": 4,
+    "01111": 7,
+    "11100": 3,
+    "01110": 1,
+    "00111": 2,
+    "00100": 3,
+    "11000": 3,
+    "11010": 1,
+    "10111": 2,
+    "01100": 1,
+    "01000": 1,
+    "00011": 1,
+    "10101": 1
+   }
+  }
+ ]
+}
