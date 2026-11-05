@@ -1,7 +1,11 @@
 .env
 __pycache__/
 *.pyc
-apikey.json
+.venv/
+.pytest_cache/
+porocilo-seminarska-naloga/build/
+rezultati/sim/*.log
+rezultati/sim/*.err
 
 # LaTeX pomožne datoteke predloga teme
 predlog-teme/*.aux
