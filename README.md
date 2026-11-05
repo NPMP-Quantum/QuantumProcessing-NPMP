@@ -92,4 +92,4 @@ simulatorja Aer (npr. `GHZ_NITI=1`), privzeto jih Aer izbere sam.
    ```
 
 Poročilo je poglavje zbornika: `porocilo-seminarska-naloga/main.tex` se prevede znotraj predloge zbornika kot mapa
-`Skupina20`.
+`Skupina20`. Samostojni `main.pdf` namesto uvodnih strani zbornika vključi `naslovnica.tex` (naslovnica, kazalo, številčenje).

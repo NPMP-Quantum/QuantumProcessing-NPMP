@@ -1,0 +1,60 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Naslovnica, kazalo in številčenje za samostojni PDF poročila.
+% main.tex ostane poglavje zbornika; to datoteko se vključi namesto
+% uvodnih strani zbornika, tik pred \import{Skupina20/}{main}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+
+\hypersetup{
+  pdftitle={Meja prepletenosti na procesorju IBM: koliko kubitov lahko zares prepletemo v stanje GHZ},
+  pdfauthor={Dominik Krašovec, Erik Radovičevič}
+}
+
+% Številke razdelkov, enačb, slik in tabel brez številke poglavja.
+\renewcommand\thesection{\@arabic\c@section}
+\renewcommand\thesubsection{\thesection.\@arabic\c@subsection}
+\renewcommand\theequation{\@arabic\c@equation}
+\renewcommand\thefigure{\@arabic\c@figure}
+\renewcommand\thetable{\@arabic\c@table}
+
+% Naslov je na naslovnici, zato ga poglavje in glave strani ne ponovijo.
+\def\title#1{}
+\def\titlerunning#1{}
+\def\author#1{}
+\def\maketitle{}
+
+% Brez praznih strani; številka je na vsaki strani, tudi na začetku literature.
+\let\cleardoublepage\clearpage
+\let\clearemptydoublepage\clearpage
+\let\startnewpage\clearpage
+\let\ps@bchap\ps@plain
+\renewcommand\backmatter{\clearpage}
+
+\makeatother
+
+% Naslovnica
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2.5cm}
+{\LARGE\bfseries Meja prepletenosti na procesorju IBM: koliko kubitov lahko zares prepletemo v stanje GHZ\par}
+\vspace{1.2cm}
+{\large Seminarska naloga za kvantno procesiranje pri predmetu Nekonvencionalne platforme in metode procesiranja\par}
+\end{center}
+\vspace{5cm}
+\begin{flushright}
+Avtorja: Dominik Krašovec, Erik Radovičevič
+\end{flushright}
+\vfill
+\begin{center}
+Ljubljana, November 2026
+\end{center}
+\clearpage
+
+% Kazalo, brez številke strani
+\tableofcontents
+\thispagestyle{empty}
+\clearpage
+
+% Številčenje se začne takoj za kazalom.
+\pagenumbering{arabic}
+\pagestyle{plain}
