@@ -20,6 +20,7 @@ meritev pri 9 fazah dobimo z diskretno Fourierovo transformacijo. Podrobnosti so
 | `src/ponovi_objave.py` | ponovitev prejšnjih rezultatov v šumni simulaciji (B0: naš 5-kubitni zagon z 2. 11. 2026) |
 | `src/qpu.py` | poskus na procesorju IBM z nadzorom porabe: `nacrt`, `poslji`, `prevzemi`, `analiza` |
 | `src/ibm_status.py` | pregled računa, porabe, procesorja in nalog (samo bere) |
+| `src/preveri_branje.py` | preverba neodvisnosti napak branja na shranjenih kalibracijskih izidih (samo bere datoteke) |
 | `src/ibm_poslji.py` | prejšnja skripta za oddajo posameznega vezja (za poskuse jo nadomešča `qpu.py`) |
 | `src/izris_ghz5.py` | graf izidov 5-kubitnega preizkusa na ibm_fez z 2. 11. 2026 |
 | `tests/` | samodejni testi: idealni simulator da F = 1, ublažitev branja, faze, proračun porabe |
