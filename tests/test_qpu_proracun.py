@@ -93,7 +93,7 @@ def test_omejitev_ni_nikoli_pod_oceno():
 
 def _argumenti(meja, **k):
     return Namespace(max_sekund=meja, fake=False, dd="oboje", ime="t", shots=1000, shots_kal=4000, faze=8,
-                     odobritev=None, max_poslov=None, faktor_omejitve=2.0, **k)
+                     odobritev=None, max_poslov=None, faktor_omejitve=2.0, brez_kubitov=[], **k)
 
 
 def test_vsota_omejitev_ne_preseze_meje_ko_obracun_caka(okolje):

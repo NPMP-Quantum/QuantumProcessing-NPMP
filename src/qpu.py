@@ -222,7 +222,7 @@ def poslji(a, service, backend, poraba, posli, ocena):
         sys.exit(f"Načrt ima {len(posli)} poslov, odobrenih je {a.max_poslov}: nič ni poslano.")
 
     podatki = {"ime": a.ime, "backend": backend.name, "fake": a.fake, "shots": a.shots, "shots_kal": a.shots_kal,
-               "stevilo_faz": a.faze,
+               "stevilo_faz": a.faze, "brez_kubitov": a.brez_kubitov,
                "max_sekund": a.max_sekund, "odobritev": a.odobritev, "model_posnetek_ms": CAS_POSNETEK_S * 1e3,
                "faktor_omejitve": a.faktor_omejitve, "posli": []}
     rezervirano = 0.0
@@ -367,6 +367,8 @@ def main():
     ap.add_argument("--shots-kal", type=int, default=4000, help="posnetki za kalibracijski vezji (ublažitev branja)")
     ap.add_argument("--faze", type=int, default=9, help="število faz na pol kroga (N ne sme biti večkratnik)")
     ap.add_argument("--dd", choices=["brez", "z", "oboje"], default="brez")
+    ap.add_argument("--brez-kubitov", type=int, nargs="+", default=[],
+                    help="kubiti, ki jih izbira ne sme uporabiti (slabi po meritvi iz prejšnjega posla)")
     ap.add_argument("--shots", type=int, default=1000)
     ap.add_argument("--max-sekund", type=float, default=None, help="skupna meja porabe, dogovorjena pred zagonom")
     ap.add_argument("--max-poslov", type=int, default=None, help="največ poslov, dogovorjeno pred zagonom")
@@ -377,6 +379,7 @@ def main():
     ap.add_argument("--odobritev", default=None, help="kratek zapis odobritve (kdo, kdaj, meja) za dnevnik")
     ap.add_argument("--fake", action="store_true", help="lokalno: FakeFez in šumni simulator, brez procesorja")
     a = ap.parse_args()
+    ghz.IZKLJUCENI_KUBITI = set(a.brez_kubitov)
     if a.faktor_omejitve < 1:
         ap.error("--faktor-omejitve mora biti vsaj 1")
     if a.model_posnetek_ms is not None and a.model_posnetek_ms <= 0:

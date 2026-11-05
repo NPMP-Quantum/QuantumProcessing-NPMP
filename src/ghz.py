@@ -39,6 +39,10 @@ def dvokubitna_vrata(backend):
     raise ValueError("procesor nima znanih dvokubitnih vrat")
 
 
+# Kubiti, ki jih izbira ne sme uporabiti: napaka, izmerjena v prejšnjem poslu, ki je objavljena kalibracija še ne kaže.
+IZKLJUCENI_KUBITI = set()
+
+
 def napake(backend):
     """Napake branja po kubitih in napake dvokubitnih vrat po povezavah (iz kalibracije lažnega/pravega procesorja)."""
     t = backend.target
@@ -55,7 +59,7 @@ def napake(backend):
         sosedi[a].add(b)
         sosedi[b].add(a)
     # kubiti z napako 1 (pokvarjeni) ali napako branja >= 0,5 ne pridejo v poštev
-    slabi = {q for q, e in branje.items() if e >= 0.5}
+    slabi = {q for q, e in branje.items() if e >= 0.5} | IZKLJUCENI_KUBITI
     for (a, b), e in vrata.items():
         if e >= 1.0:
             sosedi[a].discard(b)

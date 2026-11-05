@@ -188,3 +188,14 @@ def test_polovicne_faze_izlocijo_nizje_frekvence():
     assert ghz.koherenca(f, [pariteta(x, 20, 0.01) for x in f], 20, "pariteta") == pytest.approx(0.55, abs=0.011)
     with pytest.raises(ValueError):
         ghz.faze(16, 8)
+
+
+@pytest.mark.parametrize("zasnova, n", [("veriga", 12), ("drevo", 25)])
+def test_izkljuceni_kubiti_niso_izbrani(monkeypatch, zasnova, n):
+    """Kubit iz privzete postavitve po izključitvi ni več v njej, število kubitov pa ostane enako."""
+    osnovna = ghz.zasnova_za(BACKEND, zasnova, n).postavitev
+    izkljuceni = {osnovna[1], osnovna[-1]}
+    monkeypatch.setattr(ghz, "IZKLJUCENI_KUBITI", izkljuceni)
+    nova = ghz.zasnova_za(BACKEND, zasnova, n).postavitev
+    assert len(set(nova)) == n
+    assert not izkljuceni & set(nova)
