@@ -1,0 +1,98 @@
+% Prijava teme seminarske naloge -- NPMP 2026/2027, kvantno procesiranje
+% Skupina 20. Prevajanje: pdflatex predlog_teme.tex
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovene]{babel}
+\usepackage{mathptmx}
+\usepackage{courier}
+\usepackage[a4paper,margin=1.7cm,top=1.4cm,bottom=1.4cm]{geometry}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\pagestyle{empty}
+\sloppy
+
+\begin{document}
+
+{\large\textbf{Prijava teme seminarske naloge -- NPMP 2026/27, kvantno procesiranje}}\\
+\textbf{Skupina 20:} Dominik Krašovec, Erik Radovičevič \hfill Ljubljana, [DATUM ODDAJE]
+
+\medskip
+\textbf{Naslov:} \emph{Meja prepletenosti na procesorju IBM: koliko kubitov lahko zares prepletemo v stanje GHZ?}
+
+\textbf{Raziskovalno vprašanje.} Koliko kubitov lahko procesor IBM Heron (ibm\_fez, 156 kubitov) pripravi v stanje GHZ
+$\ket{\mathrm{GHZ}_N}=\tfrac{1}{\sqrt2}(\ket{0}^{\otimes N}+\ket{1}^{\otimes N})$ z zvestobo $F>0{,}5$
+(zadosten pogoj za \emph{pravo} večdelno prepletenost vseh $N$ kubitov) in za koliko kubitov to mejo $N_{\max}$
+premakneta (a)~zasnova vezja (linearna veriga proti drevesu z majhno globino) ter (b)~dinamično razklapljanje (DD) in ublažitev napak branja?
+
+\textbf{Hipoteza.} Hipoteza je napoved klasičnega modela proračuna napak (vrata, čakanje, branje) iz kalibracije FakeFez, ki se s
+šumno simulacijo pri $N\le13$ ujema na največ 0,016. Največji $N$ z napovedanim $F>0{,}5$: linearna veriga $N_{\max}\approx 26$
+brez ublažitve in $\approx 33$ z ublažitvijo branja, drevo z globino $\propto\!\sqrt N$ pa $\approx 33$ oziroma $\approx 70$. Surovo mejo določajo predvsem napake branja, mejo verige pa
+čakanje kubitov. DD bolj pomaga verigi, ker njeni kubiti dlje čakajo; šumni model pozna le markovski T1/T2, zato učinek DD
+izmerimo samo na procesorju.
+
+\textbf{Metrike.}
+\begin{itemize}
+\item Zvestoba $F=(P+C)/2$: populacija $P=p(0\dots0)+p(1\dots1)$, koherenca $C=2\abs{c_N}$, kjer je $c_N$ Fourierova komponenta
+      frekvence $N$ paritete $\expval{\Pi(\phi)}$ po rotaciji vseh kubitov v bazo $\cos\phi\,X+\sin\phi\,Y$, izmerjene pri 9 fazah
+      $\phi_k=\pi k/9$. Pariteta vsebuje le frekvence $N, N-2,\dots$, zato diskretna Fourierova transformacija (DFT) loči signal od
+      šumnih členov (ostanejo le členi z 9, 18, \dots{} hkratnimi preklopi; $N$ ni večkratnik 9).
+\item $F$ surovo in z lokalno ublažitvijo branja (matrika $2\times2$ na kubit iz kalibracijskih vezij $\ket{0\dots0}$ in
+      $\ket{1\dots1}$, po 4000 posnetkov). Negotovost z zankanjem (\emph{bootstrap}), ki na novo vzorči tudi kalibracijo.
+\item $N_{\max}$: največji $N$ s $F-2\sigma_F>0{,}5$, za vsako od 4 konfiguracij (veriga/drevo $\times$ brez/z DD), surovo in
+      ublaženo; med izmerjenimi $N$ ga podamo kot interval. Prirastek $\Delta N_{\max}$ zaradi zasnove, DD in ublažitve.
+\item Lastnosti vezja pred prevajanjem in po njem (globina, število vrat CZ), po prevajanju še trajanje; razlika med modelom in procesorjem.
+\end{itemize}
+
+\textbf{Načrt poskusov.}
+\begin{enumerate}
+\item \emph{Vezja:} veriga po najcenejši najdeni poti v grafu povezav (iskanje v globino; cena je vsota napak branja in vrat iz kalibracije), drevo z iskanjem v
+      širino (BFS) iz korena z najmanjšo oceno napak in globine. Obe brez dodanih vrat SWAP ($N-1$ vrat CZ).
+\item \emph{Idealni simulator} (Qiskit Aer, metoda MPS): preverba $F=1$. \emph{Šumni simulator} FakeFez (kalibracija
+      26.\,2.\,2025) do $N\approx 13$--$20$ in model proračuna napak za vse $N$. Ponovitev prejšnjega dela: naš 5-kubitni zagon
+      na ibm\_fez ($P=0{,}855$) proti FakeFez.
+\item \emph{Pilot} na ibm\_fez (1 posel, 88 vezij): veriga $N=10, 22$, drevo $N=20, 40$, vsaka točka brez in z DD
+      (impulza X v času čakanja); točka ima 1 populacijsko in 9 paritetnih vezij, posel še 8 kalibracijskih. Preveri model porabe.
+\item \emph{Glavni zagon} (1 posel, 148 vezij): veriga $N=16, 28, 34$, drevo $N=30, 50, 64, 76$; po pilotu seznama $N$ premaknemo,
+      če ibm\_fez odstopa od modela. Para brez/z DD sta v istem poslu, zato ju ne loči sprememba kalibracije.
+\item Po potrebi 1 posel za zgostitev točk okoli $N_{\max}$. Primerjava: simulator / model / procesor ter objave
+      (18 kubitov, $F=0{,}517$, Wei idr.\ 2020; 27 kubitov, $F=0{,}546$, Mooney idr.\ 2021; 120 kubitov, $F=0{,}56$, IBM 2025).
+\end{enumerate}
+
+\textbf{Ocena procesorskega časa.} Izmerjeno 2.\,11.\,2026: 5-kubitni GHZ, 1 vezje $\times$ 1000 posnetkov na ibm\_fez
+(job ID \texttt{dbk48fl6p51s73clupeg}) je porabil \textbf{2~s} (ocena IBM 2,27~s). To se ujema z modelom IBM
+$t \approx 2\,\mathrm{s}\cdot(\text{št.\ poslov}) + 0{,}35\,\mathrm{ms}\cdot(\text{št.\ vezij}\times\text{št.\ posnetkov})$,
+zato vezja združujemo v malo poslov (1000 posnetkov na vezje).
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+Del poskusa & vezja & posli & ocena časa \\
+\midrule
+prvi preizkus (2.\,11.\,2026) & 1 & 1 & 2~s (zaračunano) \\
+pilot & 88 & 1 & 33~s \\
+glavni zagon & 148 & 1 & 54~s \\
+zgostitev okoli $N_{\max}$ (po potrebi) & $\le 48$ & 1 & $\le 19$~s \\
+\midrule
+\textbf{skupaj} & $\boldsymbol{\le 285}$ & $\boldsymbol{\le 4}$ & \textbf{$\approx$\,108~s} \\
+\bottomrule
+\end{tabular}
+\end{center}
+Na voljo je 598~s (Open Plan: 600~s v drsečem 28-dnevnem oknu). Vsak posel ima zgornjo mejo trajanja (\texttt{max\_execution\_time}),
+skripta jo pred oddajo rezervira v dogovorjenem proračunu, po pilotu pa ustavimo, če je zaračunani čas na posnetek več kot 1,3-krat
+večji od modela.
+
+\textbf{Orodja.} Python~3, Qiskit~2.6 (vezja, prevajanje, razporejanje ALAP, DD), Qiskit Aer 0.18 (MPS, šumni model FakeFez),
+qiskit-ibm-runtime 0.51 (SamplerV2), NumPy, Matplotlib, pytest; IBM Quantum Open Plan; \LaTeX{} (predloga zbornika); GitHub.\par
+
+\textbf{Razdelitev dela.} Oba člana (Dominik in Erik) delava na vseh delih naloge: gradnja vezij (veriga, BFS drevo) in izbira
+kubitov, simulacije (idealni, FakeFez) in model napak, zagoni na IBM in beleženje job ID ter porabe časa, analiza ($P$, $C$, $F$,
+\emph{bootstrap}, ublažitev branja), pregled literature, uvod, razprava, prosojnice in repozitorij (README). Tako oba razumeva celotno delo.
+Vsak del napiše ali izvede eden, drugi ga pregleda in neodvisno ponovi, vlogi pa si po delih izmenjava.
+
+\end{document}

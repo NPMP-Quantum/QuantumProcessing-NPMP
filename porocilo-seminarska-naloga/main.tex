@@ -1,0 +1,430 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Skupina20/main.tex -- Meja prepletenosti na procesorju IBM (stanja GHZ)
+%
+% Pravila predloge: brez \usepackage, slike v Skupina20/img/,
+% vse oznake in ključi virov z "g20:", naši viri v references.bib v tej mapi
+% (gradnja jih doda k references.bib predloge).
+%
+% Besedilo v oglatih oklepajih [ ... ] je še za dopolniti.
+% Okvirje "Opomba za skupino" pred oddajo IZBRIŠEMO.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\graphicspath{{Skupina20/img/}}
+
+\title{Meja prepletenosti na procesorju IBM: koliko kubitov lahko zares prepletemo v stanje GHZ?}
+\titlerunning{Meja prepletenosti na procesorju IBM}
+\author{Dominik Krašovec in Erik Radovičevič}
+\maketitle
+
+\abstract{[Povzetek napišemo na koncu, ko imamo rezultate. Vsebovati mora: raziskovalno vprašanje (največje število kubitov $N_{\max}$, ki jih procesor IBM Heron prepleta v stanje GHZ z zvestobo $F>0{,}5$), metodo (populacije in paritetne oscilacije, linearna veriga proti drevesu, dinamično razklapljanje in ublažitev napak branja), glavni rezultat s številko, npr.\ \enquote{Linearna veriga doseže $N_{\max}=[\ ]$, drevo z ublažitvijo pa $N_{\max}=[\ ]$}, in en stavek o pomenu.]}
+
+
+%======================================================================
+\begin{svgraybox}
+\textbf{Opomba za skupino (pred oddajo izbriši).} To poglavje je ogrodje, ki ga skupaj dopolnjujemo. Uvod in Metode so že
+napisani tako, da iz njih razberete, \emph{kaj} bomo merili in \emph{zakaj}; Rezultati, Razprava in Zaključek so še prazni.
+Pred začetkom preberite:
+\begin{itemize}
+\item razdelek~\ref{g20:sec:uvod} (kaj je stanje GHZ in zakaj je $F>0{,}5$ prava meja),
+\item razdelek~\ref{g20:sec:merjenje} (kako $F$ izmerimo -- to je jedro naloge),
+\item razdelek~\ref{g20:sec:cas} (procesorski čas je omejen na 600~s v 28 dneh, zato \textbf{nič ne poženemo na pravem procesorju brez dogovora}).
+\end{itemize}
+Koda je v \texttt{src/}, surovi rezultati z job ID v \texttt{rezultati/naloge.jsonl}. Roki: prijava teme 15.\,11.\,2026,
+oddaja 22.\,11.\,2026, zagovor v tednu od 23.\,11.\,2026. Poročilo naj ima $\approx$\,10 strani.
+\end{svgraybox}
+%======================================================================
+
+
+\section{Uvod}
+\label{g20:sec:uvod}
+
+Prepletenost je vir, ki kvantnim računalnikom omogoča prednost pred klasičnimi~\cite{nielsen2010}. Algoritmi, ki naj bi bili
+uporabni, potrebujejo prepletenost čez veliko kubitov hkrati, današnji procesorji pa so šumni~\cite{preskill2018}: vsaka
+dvokubitna vrata, vsak čas mirovanja in vsako branje prispevajo napako. Zato je naravno vprašanje, \emph{čez koliko kubitov
+lahko danes dejansko ustvarimo prepletenost}. Na to vprašanje odgovarja priprava stanja Greenberger--Horne--Zeilinger
+(GHZ)~\cite{g20:greenberger1990}
+\begin{equation}
+\ket{\mathrm{GHZ}_N} = \frac{1}{\sqrt{2}}\left(\ket{0}^{\otimes N} + \ket{1}^{\otimes N}\right),
+\label{g20:eq:ghz}
+\end{equation}
+ki je \enquote{najbolj krhko} večdelno prepleteno stanje: ena sama napaka faze na kateremkoli kubitu uniči koherenco med
+obema členoma. Stanje GHZ je zato strog in pogosto uporabljen preizkus kakovosti procesorja.
+
+Mera, ki jo uporabimo, je zvestoba $F=\bra{\mathrm{GHZ}_N}\rho\ket{\mathrm{GHZ}_N}$ izmerjenega stanja $\rho$ glede na
+idealno. Če velja $F>0{,}5$, je stanje dokazano \emph{pravo večdelno prepleteno} (angl.\ \emph{genuine multipartite
+entanglement}), tj.\ ni ga mogoče zapisati kot mešanico stanj, v katerih bi bila katerakoli skupina kubitov ločena od
+ostalih~\cite{g20:guhne2009}. Meja $0{,}5$ torej ni dogovor, ampak ima fizikalni pomen.
+
+\textbf{Kaj so drugi že naredili.} Zvestobo stanj GHZ iz populacij in paritetnih oscilacij so prvič merili na ionih
+(4~ioni~\cite{g20:sackett2000}, 14~ionov~\cite{g20:monz2011}). Na superprevodnih procesorjih IBM so poročali o 18-kubitnem
+stanju z $F=0{,}517$~\cite{g20:wei2020} in o 27-kubitnem stanju z $F=0{,}546$ ob ublažitvi napak branja~\cite{g20:mooney2021}.
+Leta 2025 je IBM z naprednimi tehnikami (prilagodljivo prevajanje, zaznavanje napak, začasno razračunavanje) pripravil
+120-kubitno stanje GHZ z $F=0{,}56$~\cite{g20:ibm2025bigcats}. Pri predmetu NPMP v letih 2017/18--2025/26 nobena
+seminarska naloga ni merila prepletenosti, ublažitve napak ali dinamičnega razklapljanja na realnem procesorju; skoraj vse so
+implementacije znanih algoritmov.
+
+\textbf{Kaj ostaja odprto.} Objavljeni rekordi uporabljajo tehnike in procesorski čas, ki jih študent z brezplačnim
+paketom IBM Quantum Open Plan nima. Zanima nas, \emph{koliko daleč pridemo z vezji in ublažitvijo, ki so dostopni vsakomur}, in
+kateri od teh vzvodov meji najbolj pomaga.
+
+\begin{svgraybox}
+\textbf{Raziskovalno vprašanje.} Koliko kubitov $N_{\max}$ lahko procesor IBM Heron (ibm\_fez, 156 kubitov) pripravi v stanje
+GHZ z zvestobo $F>0{,}5$ in za koliko kubitov to mejo premakneta (a)~zasnova vezja (linearna veriga proti drevesu z majhno
+globino) ter (b)~dinamično razklapljanje in ublažitev napak branja?
+
+\textbf{Pričakovani rezultat.} Napoved klasičnega modela proračuna napak (razdelek~\ref{g20:sec:model}) iz kalibracije FakeFez:
+največji $N$ z napovedanim $F>0{,}5$ je za linearno verigo $N_{\max}\approx 26$ brez ublažitve in $\approx 33$ z ublažitvijo
+branja, za drevo, prilagojeno povezavam čipa, pa $\approx 33$ oziroma $\approx 70$. Surovo mejo določajo predvsem napake branja, mejo verige pa čakanje kubitov.
+Dinamično razklapljanje bolj pomaga verigi, ker njeni kubiti dlje čakajo.
+\end{svgraybox}
+
+V razdelku~\ref{g20:sec:metode} opišemo vezja, način merjenja zvestobe in porabo procesorskega časa,
+v razdelku~\ref{g20:sec:rezultati} rezultate na simulatorjih in procesorju, v razdelku~\ref{g20:sec:razprava} pa odgovorimo
+na raziskovalno vprašanje in opišemo omejitve.
+
+
+\section{Metode}
+\label{g20:sec:metode}
+
+\subsection{Orodja in nastavitve}
+\label{g20:sec:orodja}
+
+Vezja gradimo in izvajamo v okolju Qiskit~\cite{qiskit2024}, ker neposredno podpira procesorje IBM, njihove šumne modele in
+dinamično razklapljanje. Različice in nastavitve so v tabeli~\ref{g20:tab:orodja}.
+
+\begin{table}[htbp]
+\caption{Orodja in nastavitve. [Dopolni ob glavnem zagonu: datum kalibracije ibm\_fez.]}
+\label{g20:tab:orodja}
+\centering
+\begin{tabular}{ll}
+\toprule
+Parameter & Vrednost \\
+\midrule
+Qiskit & 2.6.1 \\
+Qiskit Aer & 0.18.2 \\
+qiskit-ibm-runtime & 0.51.0 \\
+kvantni procesor & ibm\_fez (IBM Heron, 156 kubitov) \\
+šumni simulator & Aer, metoda MPS, šumni model FakeFez (kalibracija 26.\,2.\,2025) \\
+primitiv & SamplerV2 \\
+prevajanje & \texttt{optimization\_level=1}, ročna postavitev kubitov, razporejanje ALAP \\
+dinamično razklapljanje & X--X v času čakanja (\texttt{PadDynamicalDecoupling}) \\
+ublažitev napak branja & lokalna, matrika $2\times2$ na kubit \\
+faze za koherenco & $M=9$, $\phi_k=\pi k/9$ \\
+število posnetkov (\emph{shots}) & 1000 na vezje, kalibracija $4\times1000$ na stanje \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Posle oddajamo s skripto \texttt{src/qpu.py}. Ukaz \texttt{nacrt} prevede vezja in brez oddaje izpiše njihove lastnosti,
+oceno procesorskega časa po enačbi~\eqref{g20:eq:cas} in preostanek na instanci. Ukaz \texttt{poslji} zahteva zgornjo mejo
+porabe (\texttt{-{}-max-sekund}), ki smo jo dogovorili pred zagonom. Vsakemu poslu nastavi največje trajanje
+(\texttt{max\_execution\_time}) in ga pred oddajo v celoti rezervira v tej meji; rezervacijo sprosti šele, ko IBM posel obračuna.
+Posel prekliče, če je ocena IBM večja od njegove meje, nov zagon pa zavrne, dokler kateri od prejšnjih poslov ni obračunan. Job ID, postavitev
+kubitov in izide shrani v \texttt{rezultati/naloge.jsonl} in \texttt{rezultati/qpu/}.
+
+\subsection{Vezja za pripravo stanja GHZ}
+\label{g20:sec:vezja}
+
+Stanje~\eqref{g20:eq:ghz} pripravimo z Hadamardovimi vrati na prvem kubitu in $N-1$ vrati CNOT, ki \enquote{širijo}
+superpozicijo na ostale kubite. Število dvokubitnih vrat je pri obeh zasnovah enako ($N-1$), razlikuje pa se globina:
+
+\begin{itemize}
+\item \textbf{Linearna veriga} (slika~\ref{g20:fig:veriga}): CNOT-i si sledijo eden za drugim po poti kubitov na čipu.
+      Globina raste kot $N$, zato prvi kubiti dolgo mirujejo in medtem dekoherirajo.
+\item \textbf{Drevo} (slika~\ref{g20:fig:drevo}): vsak že prepleten kubit v naslednjem koraku prepleta svojega soseda, zato
+      se število prepletenih kubitov v vsakem koraku lahko podvoji. Pri povezavah vsak-z-vsakim bi bila globina
+      $\lceil\log_2 N\rceil$. Na procesorjih IBM so kubiti povezani v mrežo \emph{heavy-hex} (vsak kubit ima največ 3 sosede),
+      zato drevo zgradimo z iskanjem v širino (BFS) iz korena z najmanjšo ceno (spodaj); globina je tedaj sorazmerna z
+      razdaljo do najbolj oddaljenega kubita, približno $\sqrt{N}$.
+\end{itemize}
+Obe vezji gradimo neposredno na grafu povezav procesorja, tako da prevajalnik ne doda vrat SWAP. Kubite izberemo iz
+kalibracije procesorja (napake branja $e_q$ in napake dvokubitnih vrat $e_{qr}$):
+\begin{itemize}
+\item \textbf{veriga} je najcenejša od enostavnih poti z $N$ kubiti, ki jih požrešno iskanje v globino z vračanjem najde iz vsakega
+      začetnega kubita; cena poti je
+      $\sum_q e_q + \sum_{(q,r)} e_{qr}$;
+\item \textbf{drevo} zgradimo z BFS iz vsakega možnega korena in obdržimo tisto z najmanjšo ceno
+      $\sum_q e_q + \sum_{(q,r)} e_{qr} + 0{,}0015\,N h$, kjer je $h$ globina drevesa. Zadnji člen grobo oceni izgubo koherence
+      med čakanjem: vsak nivo drevesa pomeni $\approx 0{,}15~\mu$s čakanja za $\approx N$ kubitov, kar pri $T_2\approx100~\mu$s
+      da $\approx 0{,}0015$ na kubit in nivo. Prva različica je za koren vzela osrednji kubit in je pri $N=50$ izbrala
+      kubite s slabšim branjem od verige (povprečna napaka branja 0,0132 proti 0,0100).
+\end{itemize}
+Za vsako vezje poročamo globino in število dvokubitnih vrat pred prevajanjem in po njem ter trajanje prevedenega vezja.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\begin{quantikz}[row sep=0.25cm, column sep=0.25cm]
+\lstick{$q_0$} & \gate{H} & \ctrl{1} & \qw      & \qw      & \qw \\
+\lstick{$q_1$} & \qw      & \targ{}  & \ctrl{1} & \qw      & \qw \\
+\lstick{$q_2$} & \qw      & \qw      & \targ{}  & \ctrl{1} & \qw \\
+\lstick{$q_3$} & \qw      & \qw      & \qw      & \targ{}  & \qw
+\end{quantikz}
+\caption{Linearna veriga, globina $N$.}
+\label{g20:fig:veriga}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\begin{quantikz}[row sep=0.25cm, column sep=0.25cm]
+\lstick{$q_2$} & \qw      & \qw      & \targ{}   & \qw \\
+\lstick{$q_0$} & \gate{H} & \ctrl{1} & \ctrl{-1} & \qw \\
+\lstick{$q_1$} & \qw      & \targ{}  & \ctrl{1}  & \qw \\
+\lstick{$q_3$} & \qw      & \qw      & \targ{}   & \qw
+\end{quantikz}
+\caption{Drevo, globina $\approx\log_2 N$ pri povezavah vsak-z-vsakim.}
+\label{g20:fig:drevo}
+\end{subfigure}
+\caption{Priprava 4-kubitnega stanja GHZ z dvema zasnovama vezja. V drevesu se zadnja CNOT-a izvedeta hkrati, zato je
+vezje za en korak plitvejše; pri večjih $N$ razlika hitro raste. [Kasneje dodamo izris dejanske postavitve kubitov na ibm\_fez.]}
+\label{g20:fig:vezja}
+\end{figure}
+
+\subsection{Merjenje zvestobe}
+\label{g20:sec:merjenje}
+
+Zvestobe ne moremo izmeriti z eno samo meritvijo. Za stanje GHZ jo razstavimo na dva dela, ki ju izmerimo ločeno~\cite{g20:sackett2000, g20:mooney2021}:
+\begin{equation}
+F = \frac{P + C}{2}.
+\label{g20:eq:zvestoba}
+\end{equation}
+
+\textbf{Populacija $P$.} Vse kubite izmerimo v računski bazi; $P=p(0\dots0)+p(1\dots1)$ je delež posnetkov, ki dajo enega
+od obeh pravilnih izidov. Idealno je $P=1$. Visok $P$ še ne pomeni prepletenosti -- enak $P$ bi dala tudi klasična mešanica
+\enquote{vse 0 ali vse 1}.
+
+\textbf{Koherenca $C$ (paritetne oscilacije).} Pred meritvijo na vsak kubit apliciramo rotacijo, ki ga meri v bazi
+$\cos\phi\,X+\sin\phi\,Y$, in izračunamo pariteto $\Pi=\expval{Z^{\otimes N}}$ (delež sodih minus delež lihih izidov). Za
+stanje GHZ velja
+\begin{equation}
+\expval{\Pi(\phi)} = C\cos(N\phi + \phi_0),
+\label{g20:eq:pariteta}
+\end{equation}
+kjer je amplituda $C$ ravno velikost koherence med $\ket{0\dots0}$ in $\ket{1\dots1}$; idealno $C=1$, pri klasični mešanici
+$C=0$. Zato klasična mešanica da $F\le 0{,}5$ in meje ne more preseči.
+
+Pri šumnem stanju enačba~\eqref{g20:eq:pariteta} ne velja natančno. Pariteta je tedaj vsota členov s frekvencami $N-2j$,
+$j=0,\dots,N$: člen z $j>0$ izvira iz koherence med komplementarnima nizoma bitov, ki se od $0\dots0$ in $1\dots1$ razlikujeta v
+$j$ bitih, in ga povzroči šum. Signal ločimo z diskretno Fourierovo transformacijo pri $M$ fazah na polovici kroga,
+\begin{equation}
+c_N = \frac{1}{M}\sum_{k=0}^{M-1} \expval{\Pi(\phi_k)}\, e^{-iN\phi_k}, \qquad \phi_k=\frac{\pi k}{M}, \qquad C = 2\abs{c_N}.
+\label{g20:eq:dft}
+\end{equation}
+Vsota $\sum_k e^{-i2j\phi_k}$ je enaka nič za vsak $j$, ki ni večkratnik $M$, zato ostanejo le členi z $j=M, 2M,\dots$, ki
+zahtevajo $M$ hkratnih preklopov in so zanemarljivi. Člen z $j=N$ je konjugirani signal (frekvenca $-N$), zato $N$ ne sme
+biti večkratnik $M$. Uporabimo $M=9$, kar da 10 vezij na točko (1 populacijsko in 9 paritetnih) namesto $2N+3$ pri polnem
+naboru faz $\phi_j=\pi j/(N+1)$, $j=0,\dots,2N+1$~\cite{g20:wei2020}. V šumni simulaciji FakeFez se $C$ iz 8 faz od polnega
+nabora razlikuje za 0,009 pri $N=10$ in 0,004 pri $N=13$, kar je znotraj negotovosti. [Izid shrani v \texttt{rezultati/sim/}.]
+
+\textbf{Negotovost in kriterij.} Negotovost $F$ ocenimo z zankanjem (angl.\ \emph{bootstrap}, 200 ponovitev): števila izidov
+vsakega vezja, tudi kalibracijskih, na novo vzorčimo iz multinomske porazdelitve in $F$ izračunamo znova, zato je negotovost
+popravka branja del $\sigma_F$. Za vsako konfiguracijo je $N_{\max}$ največji $N$, pri katerem je $F-2\sigma_F>0{,}5$. Ker
+merimo le nekaj vrednosti $N$, $N_{\max}$ podamo kot interval med največjim $N$, ki kriterij izpolni, in najmanjšim, ki ga ne.
+
+\subsection{Ublažitev napak}
+\label{g20:sec:ublazitev}
+
+\textbf{Dinamično razklapljanje (DD).} V času, ko kubit čaka, nanj apliciramo zaporedje impulzov, katerih skupni učinek je
+identiteta, vendar sproti izničijo počasno fazno napako zaradi okolice~\cite{g20:viola1999, g20:ezzell2023}. Vezje ob
+prevajanju razporedimo ALAP (\enquote{čim pozneje}), tako da čakanja postanejo eksplicitni ukazi \texttt{delay}, in v vsako
+čakanje vstavimo par impulzov X (\texttt{PadDynamicalDecoupling} v Qiskitu; X--X je tudi privzeto zaporedje IBM). Vezji brez
+DD in z DD imata enaka čakanja in sta v istem poslu, zato ju ne loči sprememba kalibracije med posli. DD naj bi posebej
+pomagalo linearni verigi, kjer kubiti dolgo mirujejo. Šumni simulator pozna le markovsko relaksacijo $T_1$, $T_2$, proti kateri
+DD ne pomaga, zato učinek DD izmerimo samo na procesorju.
+
+\textbf{Ublažitev napak branja.} Kalibracijski vezji pripravita vse kubite v $\ket{0}$ oziroma $\ket{1}$ in ju takoj izmerita.
+Iz njiju za vsak kubit $i$ dobimo $e_{0,i}=p(1\,|\,0)$ in $e_{1,i}=p(0\,|\,1)$ ter matriko
+\begin{equation}
+A_i=\begin{pmatrix}1-e_{0,i} & e_{1,i}\\ e_{0,i} & 1-e_{1,i}\end{pmatrix},
+\label{g20:eq:branje}
+\end{equation}
+ki preslika pravo stanje kubita v prebrano. Napake branja različnih kubitov obravnavamo kot neodvisne (lokalna ublažitev,
+kot v~\cite{g20:mooney2021}). Popravljena vrednost $p(0\dots0)$, $p(1\dots1)$ ali paritete je tedaj utežena vsota izidov, kjer
+je utež izida produkt elementov $A_i^{-1}$ po kubitih, zato matrike velikosti $2^N\times2^N$ ne potrebujemo. To je naknadna
+obdelava; procesorski čas porabita le kalibracijski vezji. Vsak posel ju vsebuje enkrat za vse kubite, ki jih uporablja, vsako
+ponovljeno $4\times$ po 1000 posnetkov, ker morajo imeti vsa vezja v poslu enako število posnetkov.
+
+\subsection{Šumni simulator in klasični model}
+\label{g20:sec:model}
+
+\textbf{Šumni simulator.} Simuliramo z Aer po metodi matrično-produktnih stanj (MPS); stanje GHZ ima vezno dimenzijo 2, zato je
+simulacija tudi pri 50 kubitih hitra. Šumni model vzamemo iz FakeFez (posnetek kalibracije ibm\_fez s 26.\,2.\,2025). Ker so
+vezja razporejena ALAP, model na ukazih \texttt{delay} uporabi relaksacijo $T_1$, $T_2$ (Bellov par po 20~$\mu$s čakanja: pariteta
+$XX$ pade z 0,98 na 0,66 [preverbo shrani v \texttt{rezultati/sim/}]). Od modela odstopamo na dveh mestih:
+\begin{itemize}
+\item napako dvokubitnih vrat nadomestimo z njenim Paulijevim približkom (verjetnosti $p_P=\sum_k\abs{\tr(P^\dagger K_k)}^2/16$
+      za Krausove operatorje $K_k$), ker simulacija MPS pri dvokubitnih kanalih Krausa obtiči
+      (razdelek~\ref{g20:sec:neuspehi}); izgubi se le neunitalni del napake med samimi vrati;
+\item napake branja dodamo po simulaciji kot klasične preklope bitov z nesimetričnima verjetnostma $p(1\,|\,0)$ in
+      $p(0\,|\,1)$ iz kalibracije, ker Aerov model hrani le njuno povprečje.
+\end{itemize}
+
+\textbf{Klasični model proračuna napak.} Za vsako prevedeno in razporejeno vezje izračunamo verjetnost, da nobena vrata ne
+naredijo napake, $G=\prod_g(1-e_g)$, ter razpad in izgubo koherence med čakanji,
+\begin{equation}
+A_1=\prod_i e^{-\tau_i/T_{1,i}}, \qquad D=\prod_i e^{-\tau_i/T_{2,i}},
+\label{g20:eq:model}
+\end{equation}
+kjer je $\tau_i$ skupni čas čakanja kubita $i$ po njegovih prvih vratih , pri čemer $T_2$ omejimo na $2T_1$. Z idealno ublažitvijo branja je $P=G(1+A_1)/2$ in
+$C=GD$, brez ublažitve pa $P=G\,[\prod_i(1-e_{0,i})+A_1\prod_i(1-e_{1,i})]/2$ in $C=GD\prod_i(1-e_{0,i}-e_{1,i})$; v obeh
+primerih $F=(P+C)/2$. Model je grob (vsaka napaka vrat uniči stanje, čakanja so neodvisna), a ne potrebuje simulacije, zato
+napove $F$ za vse $N$. Je naša klasična primerjava in osnova za izbiro $N$ v poskusih na procesorju.
+
+\subsection{Zasnova poskusov}
+\label{g20:sec:poskusi}
+
+\begin{enumerate}
+\item \textbf{Idealni simulator} (Aer, MPS): preverimo, da vezja in analiza dajo $F=1$ za obe zasnovi (samodejni testi v
+      \texttt{tests/}).
+\item \textbf{Ponovitev prejšnjega dela}: naš 5-kubitni zagon na ibm\_fez z 2.\,11.\,2026 ponovimo na šumnem simulatorju
+      FakeFez z enakim vezjem in številom posnetkov ter primerjamo $P$.
+\item \textbf{Šumni simulator} FakeFez pri majhnih $N$ in klasični model za vse $N$: preverba modela in napoved $N_{\max}$.
+\item \textbf{Pilotni zagon} na ibm\_fez: 1~posel, 88~vezij; veriga $N=10, 22$ in drevo $N=20, 40$, vsaka točka brez in z
+      DD. Preverimo model porabe časa; če je zaračunani čas na posnetek več kot 1,3-krat večji od modela, ustavimo.
+\item \textbf{Glavni zagon}: 1~posel, 148~vezij; veriga $N=16, 28, 34$ in drevo $N=30, 50, 64, 76$, vsaka točka brez in z DD.
+      Seznama $N$ po pilotu premaknemo, če ibm\_fez očitno odstopa od modela.
+\item Po potrebi \textbf{zgostitev}: 1~posel z do dvema dodatnima točkama okoli meje $N_{\max}$.
+\end{enumerate}
+Vsaka točka (zasnova, $N$, DD) ima 10 vezij, posel pa še 8 kalibracijskih ($2\times4$). Ker strošek točke ni odvisen od $N$,
+lahko verigo merimo okoli njene meje, drevo pa dlje.
+
+\subsection{Poraba procesorskega časa}
+\label{g20:sec:cas}
+
+Paket Open Plan omogoča 600~s procesorskega časa v drsečem 28-dnevnem oknu. IBM porabo ocenjuje kot~\cite{g20:ibmjobtime}
+\begin{equation}
+t \approx 2\,\mathrm{s}\cdot n_\text{poslov} + 0{,}35\,\mathrm{ms}\cdot n_\text{vezij}\cdot n_\text{posnetkov},
+\label{g20:eq:cas}
+\end{equation}
+kar se ujema s prvim zagonom (1 vezje $\times$ 1000 posnetkov: ocena 2,27~s, zaračunano 2~s). Ker je fiksni strošek posla
+velik, vezja združujemo v malo poslov. Načrtovana poraba je v tabeli~\ref{g20:tab:cas}.
+
+\begin{table}[htbp]
+\caption{Načrtovana poraba procesorskega časa po enačbi~\eqref{g20:eq:cas}. [Dopolni z dejansko porabo, \texttt{job.usage()}.]}
+\label{g20:tab:cas}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Del poskusa & vezja & posli & ocena [s] & dejansko [s] \\
+\midrule
+prvi preizkus (5 kubitov) & 1 & 1 & 2,3 & 2 \\
+pilotni zagon & 88 & 1 & 32,8 & [ ] \\
+glavni zagon & 148 & 1 & 53,8 & [ ] \\
+zgostitev (po potrebi) & $\le 48$ & 1 & $\le 18{,}8$ & [ ] \\
+\midrule
+skupaj & $\le 285$ & $\le 4$ & $\le 107{,}7$ & [ ] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrike}
+\label{g20:sec:metrike}
+
+\begin{itemize}
+\item zvestoba $F$, populacija $P$ in koherenca $C$ v odvisnosti od $N$ (enačbi~\eqref{g20:eq:zvestoba} in~\eqref{g20:eq:pariteta}),
+\item $F$ surovo in z ublažitvijo branja, $N_{\max}$ za vsako konfiguracijo in prirastek $\Delta N_{\max}$ zaradi zasnove
+      vezja, DD oziroma ublažitve branja,
+\item razlika $F$ med procesorjem, šumnim simulatorjem in klasičnim modelom,
+\item globina vezja in število dvokubitnih vrat pred prevajanjem in po njem, trajanje prevedenega vezja,
+\item porabljen procesorski čas na konfiguracijo.
+\end{itemize}
+
+
+\section{Rezultati}
+\label{g20:sec:rezultati}
+
+\textbf{Prvi preizkus na procesorju.} 2.\,11.\,2026 smo na ibm\_fez pognali 5-kubitno linearno verigo
+(1000 posnetkov, job ID \texttt{dbk48fl6p51s73clupeg}). Po prevajanju je imelo vezje globino 20 in 4 vrata CZ. Porazdelitev
+izidov je na sliki~\ref{g20:fig:ghz5}: $P = 0{,}460 + 0{,}395 = 0{,}855$. Asimetrija med $\ket{00000}$ in $\ket{11111}$ je
+pričakovana, ker se kubit v stanju $\ket{1}$ med čakanjem na branje lahko sprosti v $\ket{0}$. Koherence $C$ v tem preizkusu
+še nismo merili, zato zvestobe še ne poznamo.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{ghz5_ibm}
+\caption{Porazdelitev izidov 5-kubitnega stanja GHZ na procesorju ibm\_fez (1000 posnetkov). Izidi z manj kot 5 zadetki so
+združeni v stolpec \enquote{ostali}. Sliko izriše \texttt{src/izris\_ghz5.py}.}
+\label{g20:fig:ghz5}
+\end{figure}
+
+\textbf{Ponovitev na šumnem simulatorju.} Fizični kubiti zagona z 2.\,11.\,2026 niso bili zabeleženi, zato smo enako vezje
+(1000 posnetkov) simulirali na najboljši verigi FakeFez (kubiti 141, 142, 143, 136, 123) in na 10 naključnih verigah
+(\texttt{rezultati/sim/ponovitev\_B0.json}). Prevedeno vezje ima tudi tu globino 20 in 4 vrata CZ. Najboljša veriga da
+$P=0{,}948\pm0{,}007$, naključne pa $P=0{,}842$--$0{,}923$; ibm\_fez s $P=0{,}855$ leži na spodnjem robu tega razpona.
+[Razlaga: postavitev kubitov na ibm\_fez ni znana, kalibracija FakeFez je s 24.\,2.\,2025.]
+
+\textbf{Klasični model proti šumni simulaciji.} Tabela~\ref{g20:tab:model} primerja napoved modela
+(razdelek~\ref{g20:sec:model}) s šumno simulacijo verige na FakeFez. Razlika je največ 0,016; model je v petih od šestih
+primerov nekoliko višji od simulacije. [Razlaga odstopanja: \ ] [Točki $N=10$ in 13 shrani v \texttt{rezultati/sim/}.]
+
+\begin{table}[htbp]
+\caption{Zvestoba verige na FakeFez: klasični model proti šumni simulaciji (MPS).}
+\label{g20:tab:model}
+\centering
+\begin{tabular}{rrrrr}
+\toprule
+& \multicolumn{2}{c}{surovo} & \multicolumn{2}{c}{z ublažitvijo branja} \\
+$N$ & model & simulacija & model & simulacija \\
+\midrule
+5 & 0,944 & 0,932 & 0,982 & 0,972 \\
+10 & 0,854 & 0,850 & 0,942 & 0,945 \\
+13 & 0,777 & 0,764 & 0,887 & 0,871 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+[Tukaj pridejo: (1) tabela lastnosti vezij za vse $N$ in obe zasnovi; (2) graf $F(N)$ za idealni simulator, FakeFez,
+klasični model in ibm\_fez, vse 4 konfiguracije, z vodoravno črto pri $F=0{,}5$; (3) tabela $N_{\max}$ po konfiguracijah;
+(4) primerjava z objavami~\cite{g20:wei2020, g20:mooney2021, g20:ibm2025bigcats}.]
+
+
+\section{Razprava}
+\label{g20:sec:razprava}
+
+[Odgovor na raziskovalno vprašanje: ali se je hipoteza potrdila? Kateri vzvod (zasnova vezja, DD, ublažitev branja) je meji
+najbolj pomagal in zakaj? Kako dobro je šumni model FakeFez napovedal rezultat procesorja?]
+
+\textbf{Omejitve.} [Npr.: kalibracija procesorja se med dnevi spreminja; omejen procesorski čas dovoljuje le eno
+ponovitev; ublažitev branja popravi branje, ne pa napak med pripravo stanja.]
+
+\subsection{Kaj ni delovalo}
+\label{g20:sec:neuspehi}
+
+[Opomba za skupino: zahtevan je vsaj en neuspešen poskus; izberemo enega ali dva od spodnjih in dodamo morebitne s procesorja.]
+
+\textbf{Simulacija MPS je obtičala.} Simulacija 27-kubitnega stanja GHZ s šumnim modelom FakeMontrealV2 se ni nikoli končala
+in ni javila napake. Prožilo jo je termično sproščanje v dvokubitnem kanalu Krausa pri vratih CX, pojavljala pa se je šele pri
+več posnetkih (pri 200 posnetkih je delovala, pri 4000 ne). Rešitev sta Paulijev približek napake dvokubitnih vrat in
+dodajanje napak branja po simulaciji (razdelek~\ref{g20:sec:model}). Na FakeFez je približek 5-kubitni $F$ spremenil le z
+0,978 na 0,974 [izid ni shranjen: ponovi ali številki izbriši].
+
+\textbf{Simetrične napake branja.} Aerov šumni model napako branja kubita hrani kot povprečje $p(1\,|\,0)$ in $p(0\,|\,1)$,
+zato simulacija ni kazala asimetrije med $\ket{0\dots0}$ in $\ket{1\dots1}$, ki smo jo videli na ibm\_fez (460 proti 395
+zadetkov). Zdaj obe verjetnosti beremo iz kalibracije procesorja vsako posebej.
+
+\textbf{Ponovitev objav na simulatorjih starih procesorjev.} Načrtovali smo tudi ponovitev rezultatov~\cite{g20:wei2020, g20:mooney2021} na šumnih modelih takratnih procesorjev (FakeMontrealV2 in 20-kubitni modeli). Dolge simulacije na vseh jedrih so prenosnik večkrat pregrele do izklopa. Ponovitvi smo opustili, ker za raziskovalno vprašanje nista potrebni: z objavami neposredno primerjamo naše točke na ibm\_fez pri $N=20$--$30$.
+
+\textbf{Poraba 0~s.} Naša prva skripta za preverjanje dostopa je po prvem zagonu izpisala porabo 0~s, ker je porabo prebrala,
+preden jo je IBM obračunal; dejanska poraba je bila 2~s. Enaka past bi pokvarila tudi proračun: če bi porabo šteli sproti,
+bi lahko oddali več, kot smo dogovorili. Zato \texttt{src/qpu.py} vsakemu poslu vnaprej rezervira njegovo največje trajanje in
+rezervacijo sprosti šele po obračunu (razdelek~\ref{g20:sec:orodja}).
+
+
+\section{Zaključek}
+\label{g20:sec:zakljucek}
+
+[Glavni rezultat v nekaj stavkih in predlog nadaljnjega dela, npr.\ dinamična vezja z meritvami sredi vezja, ki omogočajo
+pripravo GHZ v konstantni globini.]
+
+
+\section*{Doprinosi avtorjev}
+
+[Za vsakega člana (Dominik, Erik) dva do tri stavke. Dogovor: oba delava na vseh delih (vezja in izbira kubitov, simulacije
+in zagoni na IBM, analiza, literatura, uvod, razprava, prosojnice, README); vsak del napiše ali izvede eden, drugi ga pregleda
+in neodvisno ponovi. Tu iskreno napiši, kdo je kaj dejansko naredil.]
+
+\section*{Izjava o uporabi generativne umetne inteligence}
+
+Pri razvoju smo si pomagali z orodjem generativne umetne inteligence: pri iskanju informacij, razlagi konceptov, pisanju kode,
+pripravi in analizi poskusov ter pisanju in urejanju besedila poročila.
