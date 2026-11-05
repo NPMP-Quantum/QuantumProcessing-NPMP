@@ -198,8 +198,8 @@ c_N = \frac{1}{M}\sum_{k=0}^{M-1} \expval{\Pi(\phi_k)}\, e^{-iN\phi_k}, \qquad \
 Vsota $\sum_k e^{-i2j\phi_k}$ je enaka nič za vsak $j$, ki ni večkratnik $M$, zato ostanejo le členi z $j=M, 2M,\dots$, ki
 zahtevajo $M$ hkratnih preklopov in so zanemarljivi. Člen z $j=N$ je konjugirani signal (frekvenca $-N$), zato $N$ ne sme
 biti večkratnik $M$. Uporabimo $M=9$, kar da 10 vezij na točko (1 populacijsko in 9 paritetnih) namesto $2N+3$ pri polnem
-naboru faz $\phi_j=\pi j/(N+1)$, $j=0,\dots,2N+1$~\cite{g20:wei2020}. V šumni simulaciji FakeFez se $C$ iz 8 faz od polnega
-nabora razlikuje za 0,009 pri $N=10$ in 0,004 pri $N=13$, kar je znotraj negotovosti. [Izid shrani v \texttt{rezultati/sim/}.]
+naboru faz $\phi_j=\pi j/(N+1)$, $j=0,\dots,2N+1$~\cite{g20:wei2020}. V šumni simulaciji FakeFez se $C$ iz 9 faz od polnega
+nabora razlikuje za 0,004 pri $N=10$ in 0,006 pri $N=13$, kar je znotraj negotovosti (\texttt{rezultati/sim/preveri\_simulator.json}).
 
 \textbf{Negotovost in kriterij.} Negotovost $F$ ocenimo z zankanjem (angl.\ \emph{bootstrap}, 200 ponovitev): števila izidov
 vsakega vezja, tudi kalibracijskih, na novo vzorčimo iz multinomske porazdelitve in $F$ izračunamo znova, zato je negotovost
@@ -236,7 +236,7 @@ ponovljeno $4\times$ po 1000 posnetkov, ker morajo imeti vsa vezja v poslu enako
 \textbf{Šumni simulator.} Simuliramo z Aer po metodi matrično-produktnih stanj (MPS); stanje GHZ ima vezno dimenzijo 2, zato je
 simulacija tudi pri 50 kubitih hitra. Šumni model vzamemo iz FakeFez (posnetek kalibracije ibm\_fez s 26.\,2.\,2025). Ker so
 vezja razporejena ALAP, model na ukazih \texttt{delay} uporabi relaksacijo $T_1$, $T_2$ (Bellov par po 20~$\mu$s čakanja: pariteta
-$XX$ pade z 0,98 na 0,66 [preverbo shrani v \texttt{rezultati/sim/}]). Od modela odstopamo na dveh mestih:
+$XX$ pade z 0,98 na 0,65). Od modela odstopamo na dveh mestih:
 \begin{itemize}
 \item napako dvokubitnih vrat nadomestimo z njenim Paulijevim približkom (verjetnosti $p_P=\sum_k\abs{\tr(P^\dagger K_k)}^2/16$
       za Krausove operatorje $K_k$), ker simulacija MPS pri dvokubitnih kanalih Krausa obtiči
@@ -333,7 +333,7 @@ Natančnejša primerjava ni mogoča, ker postavitev kubitov tega zagona ni znana
 
 \textbf{Klasični model proti šumni simulaciji.} Tabela~\ref{g20:tab:model} primerja napoved modela
 (razdelek~\ref{g20:sec:model}) s šumno simulacijo verige na FakeFez. Razlika je največ 0,016; model je v petih od šestih
-primerov nekoliko višji od simulacije. [Točki $N=10$ in 13 shrani v \texttt{rezultati/sim/}.]
+primerov nekoliko višji od simulacije (\texttt{rezultati/sim/veriga\_fakefez.json}).
 
 \begin{table}[htbp]
 \caption{Zvestoba verige na FakeFez: klasični model proti šumni simulaciji (MPS).}
@@ -344,7 +344,7 @@ primerov nekoliko višji od simulacije. [Točki $N=10$ in 13 shrani v \texttt{re
 & \multicolumn{2}{c}{surovo} & \multicolumn{2}{c}{z ublažitvijo branja} \\
 $N$ & model & simulacija & model & simulacija \\
 \midrule
-5 & 0,944 & 0,932 & 0,982 & 0,972 \\
+5 & 0,944 & 0,937 & 0,982 & 0,977 \\
 10 & 0,854 & 0,850 & 0,942 & 0,945 \\
 13 & 0,777 & 0,764 & 0,887 & 0,871 \\
 \bottomrule

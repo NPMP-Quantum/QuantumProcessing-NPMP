@@ -22,12 +22,13 @@ meritev pri 9 fazah dobimo z diskretno Fourierovo transformacijo. Podrobnosti so
 | `src/ibm_status.py` | pregled računa, porabe, procesorja in nalog (samo bere) |
 | `src/preveri_branje.py` | preverba neodvisnosti napak branja na shranjenih kalibracijskih izidih (samo bere datoteke) |
 | `src/izris_rezultatov.py` | graf $F(N)$, tabeli poročila in meje $N_{\max}$ iz shranjenih izidov (samo bere datoteke) |
+| `src/preveri_simulator.py` | preverbe šumnega simulatorja: relaksacija med čakanjem, model proti simulaciji, 9 faz proti polnemu naboru |
 | `src/ibm_poslji.py` | prejšnja skripta za oddajo posameznega vezja (za poskuse jo nadomešča `qpu.py`) |
 | `src/izris_ghz5.py` | graf izidov 5-kubitnega preizkusa na ibm_fez z 2. 11. 2026 |
 | `tests/` | samodejni testi: idealni simulator da F = 1, ublažitev branja, faze, proračun porabe |
 | `rezultati/naloge.jsonl` | dnevnik vseh poslov na procesorju (job ID, postavitev kubitov, poraba) |
 | `rezultati/sim/`, `rezultati/qpu/` | izidi simulacij in poslov: parametri, različice, števila izidov, rezultati |
-| `porocilo-seminarska-naloga/` | poglavje za zbornik (`main.tex`, `references.bib`, `img/`) in prijava teme (`tasks/predlog_teme.tex`) |
+| `porocilo-seminarska-naloga/` | poglavje za zbornik (`main.tex`, `references.bib`, `img/`) prijava teme (`tasks/predlog_teme.tex`) in prosojnice (`prosojnice/`) |
 
 ## Namestitev
 
@@ -59,6 +60,8 @@ simulatorja Aer (npr. `GHZ_NITI=1`), privzeto jih Aer izbere sam.
 4. Šumna simulacija verige (primer):
    ```bash
    .venv/bin/python src/poskus.py --backend FakeFez --zasnova veriga --n 5 10 13 --metoda pariteta --ime veriga_fakefez
+   .venv/bin/python src/poskus.py --backend FakeFez --zasnova veriga --n 10 13 --metoda pariteta --stevilo-faz 9 --ime veriga_fakefez_9faz
+   .venv/bin/python src/preveri_simulator.py   # relaksacija med čakanjem, model proti simulaciji, 9 faz proti polnemu naboru
    ```
 5. Procesor IBM. **Porabi procesorski čas** (Open Plan: 600 s v 28 dneh), zato najprej `nacrt`, ki ne odda ničesar.
    Žeton in instanco vpišite v `.env` (predloga `.env.example`). Celotno pot lahko brez procesorja preizkusite z `--fake`.

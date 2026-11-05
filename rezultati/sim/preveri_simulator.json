@@ -1,0 +1,63 @@
+{
+ "cas": "2026-11-05T16:00:20+00:00",
+ "opis": "preverbe šumnega simulatorja FakeFez",
+ "razlicice": {
+  "python": "3.13.12",
+  "qiskit": "2.6.1",
+  "qiskit_aer": "0.18.2",
+  "qiskit_ibm_runtime": "0.51.0"
+ },
+ "poskusi": [
+  {
+   "bell": {
+    "postavitev": [
+     96,
+     103
+    ],
+    "posnetki": 8000,
+    "cakanje_us": 20,
+    "xx_brez_cakanja": 0.98325,
+    "xx_s_cakanjem": 0.6545
+   },
+   "model_proti_simulaciji": [
+    {
+     "n": 5,
+     "model_surovo": 0.9435181609833181,
+     "sim_surovo": 0.936716583523489,
+     "model_ublazeno": 0.981557036784956,
+     "sim_ublazeno": 0.9772278848434952
+    },
+    {
+     "n": 10,
+     "model_surovo": 0.8536990497488156,
+     "sim_surovo": 0.85020540498142,
+     "model_ublazeno": 0.9422960096934282,
+     "sim_ublazeno": 0.9449247486478338
+    },
+    {
+     "n": 13,
+     "model_surovo": 0.7765193884579664,
+     "sim_surovo": 0.7639120317980345,
+     "model_ublazeno": 0.8868904475109272,
+     "sim_ublazeno": 0.8707490906616064
+    }
+   ],
+   "faze": [
+    {
+     "n": 10,
+     "C_polni": 0.79266080996284,
+     "C_9": 0.7970257183843193,
+     "razlika": 0.004364908421479297,
+     "sigma": 0.01100189489166024
+    },
+    {
+     "n": 13,
+     "C_polni": 0.6728240635960689,
+     "C_9": 0.6784978366325877,
+     "razlika": 0.0056737730365187256,
+     "sigma": 0.012420114190181387
+    }
+   ]
+  }
+ ]
+}
