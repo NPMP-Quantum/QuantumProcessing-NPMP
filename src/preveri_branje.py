@@ -3,7 +3,7 @@
 Če so napake branja med kubiti neodvisne, je verjetnost izida vseh ničel (enic) enaka produktu verjetnosti po kubitih,
 pričakovana parnost pa produktu (1 - 2p). Razmerje opaženo/lokalno blizu 1 pomeni, da kalibracija korelacij ne kaže.
 
-Uporaba: python src/preveri_branje.py pilot glavni zgostitev
+Uporaba: python src/preveri_branje.py pilot glavni zgostitev dodatni
 """
 import json
 import math
@@ -80,6 +80,6 @@ def najslabsi_kubiti(imena, koliko=6):
 
 
 if __name__ == "__main__":
-    imena_poskusov = sys.argv[1:] or ["pilot", "glavni", "zgostitev"]
+    imena_poskusov = sys.argv[1:] or ["pilot", "glavni", "zgostitev", "dodatni"]
     main(imena_poskusov)
     najslabsi_kubiti(imena_poskusov)

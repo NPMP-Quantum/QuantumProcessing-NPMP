@@ -21,6 +21,7 @@ meritev pri 9 fazah dobimo z diskretno Fourierovo transformacijo. Podrobnosti so
 | `src/qpu.py` | poskus na procesorju IBM z nadzorom porabe: `nacrt`, `poslji`, `prevzemi`, `analiza` |
 | `src/ibm_status.py` | pregled računa, porabe, procesorja in nalog (samo bere) |
 | `src/preveri_branje.py` | preverba neodvisnosti napak branja na shranjenih kalibracijskih izidih (samo bere datoteke) |
+| `src/izris_rezultatov.py` | graf $F(N)$, tabeli poročila in meje $N_{\max}$ iz shranjenih izidov (samo bere datoteke) |
 | `src/ibm_poslji.py` | prejšnja skripta za oddajo posameznega vezja (za poskuse jo nadomešča `qpu.py`) |
 | `src/izris_ghz5.py` | graf izidov 5-kubitnega preizkusa na ibm_fez z 2. 11. 2026 |
 | `tests/` | samodejni testi: idealni simulator da F = 1, ublažitev branja, faze, proračun porabe |
@@ -70,6 +71,22 @@ simulatorja Aer (npr. `GHZ_NITI=1`), privzeto jih Aer izbere sam.
    `poslji` brez `--max-sekund` ne odda ničesar. Vsak posel dobi zgornjo mejo trajanja, ki se pred oddajo rezervira v tej
    meji; nov zagon se zavrne, dokler kateri od prejšnjih poslov ni obračunan. Če se čakanje prekine, izide prevzame
    `qpu.py prevzemi --ime <ime>`.
+
+   Preostali posli iz poročila (izidi so v `rezultati/qpu/`, zato jih za analizo ni treba ponavljati):
+   ```bash
+   .venv/bin/python src/qpu.py poslji --ime glavni --n-veriga 16 28 34 --n-drevo 30 46 50 56 --dd oboje --faze 9 \
+       --max-sekund <meja> --max-poslov 1 --faktor-omejitve 1.5 --model-posnetek-ms 0.284
+   .venv/bin/python src/qpu.py poslji --ime zgostitev --n-veriga 19 25 --n-drevo 25 53 --dd oboje --faze 9 \
+       --max-sekund <meja> --max-poslov 1 --faktor-omejitve 1.5 --model-posnetek-ms 0.284
+   .venv/bin/python src/qpu.py poslji --ime dodatni --zasnove drevo --n-drevo 25 50 53 --brez-kubitov 113 131 --dd oboje --faze 9 \
+       --max-sekund <meja> --max-poslov 1 --faktor-omejitve 1.5 --model-posnetek-ms 0.284
+   ```
+6. Slika, tabele in preverbe iz shranjenih izidov (brez procesorja):
+   ```bash
+   .venv/bin/python src/qpu.py analiza --ime glavni          # enako za pilot, zgostitev, dodatni
+   .venv/bin/python src/izris_rezultatov.py                  # img/ghz_fn.pdf, tabeli poročila, meje N_max, učinek DD
+   .venv/bin/python src/preveri_branje.py                    # neodvisnost napak branja, napaka branja po kubitih
+   ```
 
 Poročilo je poglavje zbornika: `porocilo-seminarska-naloga/main.tex` se prevede znotraj predloge zbornika kot mapa
 `Skupina20`.

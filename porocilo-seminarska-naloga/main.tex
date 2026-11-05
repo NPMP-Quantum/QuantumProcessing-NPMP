@@ -16,23 +16,9 @@
 \author{Dominik Krašovec in Erik Radovičevič}
 \maketitle
 
-\abstract{[Povzetek napišemo na koncu, ko imamo rezultate. Vsebovati mora: raziskovalno vprašanje (največje število kubitov $N_{\max}$, ki jih procesor IBM Heron prepleta v stanje GHZ z zvestobo $F>0{,}5$), metodo (populacije in paritetne oscilacije, linearna veriga proti drevesu, dinamično razklapljanje in ublažitev napak branja), glavni rezultat s številko, npr.\ \enquote{Linearna veriga doseže $N_{\max}=[\ ]$, drevo z ublažitvijo pa $N_{\max}=[\ ]$}, in en stavek o pomenu.]}
+\abstract{Merimo, koliko kubitov lahko procesor IBM Heron (ibm\_fez) prepleta v stanje GHZ z zvestobo $F>0{,}5$, kar dokazuje pravo večdelno prepletenost, in za koliko to mejo premaknejo zasnova vezja, dinamično razklapljanje (DD) in ublažitev napak branja. Zvestobo določimo iz populacije in koherence, kriterij je $F-2\sigma_F>0{,}5$. S 113~s procesorskega časa doseže veriga brez ublažitve $N_{\max}\approx 16$, drevo, prilagojeno povezavam čipa, pa $N_{\max}\approx 25$; z ublažitvijo, ob predpostavki neodvisnih napak branja, sta meji 25--28 in 50--53. DD meje ne premakne. Klasični model meje precenjuje, napaka branja enega kubita pa je med meritvami poskočila z 0,06 na 0,46, česar objavljena kalibracija ni pokazala.}
 
 
-%======================================================================
-\begin{svgraybox}
-\textbf{Opomba za skupino (pred oddajo izbriši).} To poglavje je ogrodje, ki ga skupaj dopolnjujemo. Uvod in Metode so že
-napisani tako, da iz njih razberete, \emph{kaj} bomo merili in \emph{zakaj}; Rezultati, Razprava in Zaključek so še prazni.
-Pred začetkom preberite:
-\begin{itemize}
-\item razdelek~\ref{g20:sec:uvod} (kaj je stanje GHZ in zakaj je $F>0{,}5$ prava meja),
-\item razdelek~\ref{g20:sec:merjenje} (kako $F$ izmerimo -- to je jedro naloge),
-\item razdelek~\ref{g20:sec:cas} (procesorski čas je omejen na 600~s v 28 dneh, zato \textbf{nič ne poženemo na pravem procesorju brez dogovora}).
-\end{itemize}
-Koda je v \texttt{src/}, surovi rezultati z job ID v \texttt{rezultati/naloge.jsonl}. Roki: prijava teme 15.\,11.\,2026,
-oddaja 22.\,11.\,2026, zagovor v tednu od 23.\,11.\,2026. Poročilo naj ima $\approx$\,10 strani.
-\end{svgraybox}
-%======================================================================
 
 
 \section{Uvod}
@@ -93,7 +79,7 @@ Vezja gradimo in izvajamo v okolju Qiskit~\cite{qiskit2024}, ker neposredno podp
 dinamično razklapljanje. Različice in nastavitve so v tabeli~\ref{g20:tab:orodja}.
 
 \begin{table}[htbp]
-\caption{Orodja in nastavitve. [Dopolni ob glavnem zagonu: datum kalibracije ibm\_fez.]}
+\caption{Orodja in nastavitve. Posle za glavne poskuse smo oddali 5.\,11.\,2026 med 14:26 in 14:52.}
 \label{g20:tab:orodja}
 \centering
 \begin{tabular}{ll}
@@ -115,12 +101,11 @@ faze za koherenco & $M=9$, $\phi_k=\pi k/9$ \\
 \end{tabular}
 \end{table}
 
-Posle oddajamo s skripto \texttt{src/qpu.py}. Ukaz \texttt{nacrt} prevede vezja in brez oddaje izpiše njihove lastnosti,
-oceno procesorskega časa po enačbi~\eqref{g20:eq:cas} in preostanek na instanci. Ukaz \texttt{poslji} zahteva zgornjo mejo
-porabe (\texttt{-{}-max-sekund}), ki smo jo dogovorili pred zagonom. Vsakemu poslu nastavi največje trajanje
-(\texttt{max\_execution\_time}) in ga pred oddajo v celoti rezervira v tej meji; rezervacijo sprosti šele, ko IBM posel obračuna.
-Posel prekliče, če je ocena IBM večja od njegove meje, nov zagon pa zavrne, dokler kateri od prejšnjih poslov ni obračunan. Job ID, postavitev
-kubitov in izide shrani v \texttt{rezultati/naloge.jsonl} in \texttt{rezultati/qpu/}.
+Posle oddajamo s skripto \texttt{src/qpu.py}. Ukaz \texttt{nacrt} brez oddaje izpiše lastnosti vezij in oceno časa po
+enačbi~\eqref{g20:eq:cas}. Ukaz \texttt{poslji} zahteva zgornjo mejo porabe, vsakemu poslu nastavi največje trajanje
+(\texttt{max\_execution\_time}), ga pred oddajo rezervira v tej meji in rezervacijo sprosti šele po obračunu IBM; posel prekliče, če je ocena
+IBM večja od njegove meje. Job ID, postavitev kubitov in izide shrani v \texttt{rezultati/}. Možnost \texttt{-{}-brez-kubitov} izbrane kubite
+izključi iz izbire.
 
 \subsection{Vezja za pripravo stanja GHZ}
 \label{g20:sec:vezja}
@@ -146,8 +131,7 @@ kalibracije procesorja (napake branja $e_q$ in napake dvokubitnih vrat $e_{qr}$)
 \item \textbf{drevo} zgradimo z BFS iz vsakega možnega korena in obdržimo tisto z najmanjšo ceno
       $\sum_q e_q + \sum_{(q,r)} e_{qr} + 0{,}0015\,N h$, kjer je $h$ globina drevesa. Zadnji člen grobo oceni izgubo koherence
       med čakanjem: vsak nivo drevesa pomeni $\approx 0{,}15~\mu$s čakanja za $\approx N$ kubitov, kar pri $T_2\approx100~\mu$s
-      da $\approx 0{,}0015$ na kubit in nivo. Prva različica je za koren vzela osrednji kubit in je pri $N=50$ izbrala
-      kubite s slabšim branjem od verige (povprečna napaka branja 0,0132 proti 0,0100).
+      da $\approx 0{,}0015$ na kubit in nivo.
 \end{itemize}
 Za vsako vezje poročamo globino in število dvokubitnih vrat pred prevajanjem in po njem ter trajanje prevedenega vezja.
 
@@ -177,7 +161,7 @@ Za vsako vezje poročamo globino in število dvokubitnih vrat pred prevajanjem i
 \label{g20:fig:drevo}
 \end{subfigure}
 \caption{Priprava 4-kubitnega stanja GHZ z dvema zasnovama vezja. V drevesu se zadnja CNOT-a izvedeta hkrati, zato je
-vezje za en korak plitvejše; pri večjih $N$ razlika hitro raste. [Kasneje dodamo izris dejanske postavitve kubitov na ibm\_fez.]}
+vezje za en korak plitvejše; pri večjih $N$ razlika hitro raste.}
 \label{g20:fig:vezja}
 \end{figure}
 
@@ -283,12 +267,18 @@ napove $F$ za vse $N$. Je naša klasična primerjava in osnova za izbiro $N$ v p
 \item \textbf{Šumni simulator} FakeFez pri majhnih $N$ in klasični model za vse $N$: preverba modela in napoved $N_{\max}$.
 \item \textbf{Pilotni zagon} na ibm\_fez: 1~posel, 88~vezij; veriga $N=10, 22$ in drevo $N=20, 40$, vsaka točka brez in z
       DD. Preverimo model porabe časa; če je zaračunani čas na posnetek več kot 1,3-krat večji od modela, ustavimo.
-\item \textbf{Glavni zagon}: 1~posel, 148~vezij; veriga $N=16, 28, 34$ in drevo $N=30, 50, 64, 76$, vsaka točka brez in z DD.
-      Seznama $N$ po pilotu premaknemo, če ibm\_fez očitno odstopa od modela.
-\item Po potrebi \textbf{zgostitev}: 1~posel z do dvema dodatnima točkama okoli meje $N_{\max}$.
+\item \textbf{Glavni zagon}: 1~posel, 148~vezij; veriga $N=16, 28, 34$ in drevo $N=30, 46, 50, 56$, vsaka točka brez in z DD.
+      Drevo smo po pilotu premaknili z načrtovanih $N=30, 50, 64, 76$, ker je pilot pokazal mejo pri manjšem $N$.
+\item \textbf{Zgostitev}: 1~posel, 88~vezij; veriga $N=19, 25$ in drevo $N=25, 53$ okoli mej iz glavnega zagona.
+\item \textbf{Dodatni posel}: 1~posel, 68~vezij; drevo $N=25, 50, 53$ brez kubitov 113 in 131, ker se je pri zgostitvi njuno
+      branje poslabšalo (razdelek~\ref{g20:sec:rez-qpu}).
 \end{enumerate}
 Vsaka točka (zasnova, $N$, DD) ima 10 vezij, posel pa še 8 kalibracijskih ($2\times4$). Ker strošek točke ni odvisen od $N$,
 lahko verigo merimo okoli njene meje, drevo pa dlje.
+
+\textbf{Metrike.} Merimo $F$, $P$ in $C$ v odvisnosti od $N$, surovo in z ublažitvijo branja, ter iz njih določimo $N_{\max}$ in
+prirastek $\Delta N_{\max}$ zaradi zasnove vezja, DD in ublažitve. Primerjamo procesor, šumni simulator in klasični model ter
+poročamo globino, število dvokubitnih vrat in trajanje vezij pred prevajanjem in po njem ter porabo procesorskega časa.
 
 \subsection{Poraba procesorskega časa}
 \label{g20:sec:cas}
@@ -298,66 +288,52 @@ Paket Open Plan omogoča 600~s procesorskega časa v drsečem 28-dnevnem oknu. I
 t \approx 2\,\mathrm{s}\cdot n_\text{poslov} + 0{,}35\,\mathrm{ms}\cdot n_\text{vezij}\cdot n_\text{posnetkov},
 \label{g20:eq:cas}
 \end{equation}
-kar se ujema s prvim zagonom (1 vezje $\times$ 1000 posnetkov: ocena 2,27~s, zaračunano 2~s). Ker je fiksni strošek posla
-velik, vezja združujemo v malo poslov. Načrtovana poraba je v tabeli~\ref{g20:tab:cas}.
+kar se ujema s prvim zagonom (1 vezje $\times$ 1000 posnetkov: ocena IBM 2,27~s, zaračunano 2~s). Ker je fiksni strošek posla
+velik, vezja združujemo v malo poslov. Pilot je pokazal, da je zaračunani čas manjši od te ocene: 25~s za 88\,000 posnetkov oziroma
+0,284~ms na posnetek, zato smo nadaljnje posle ocenili s to vrednostjo. Skupaj smo porabili 113~s od 600~s
+(tabela~\ref{g20:tab:cas}). Pri zadnjem poslu ocena IBM ni prispela v 90~s, zato preverba ocene ni bila mogoča; veljala je še zgornja
+meja trajanja posla, 35~s.
 
 \begin{table}[htbp]
-\caption{Načrtovana poraba procesorskega časa po enačbi~\eqref{g20:eq:cas}. [Dopolni z dejansko porabo, \texttt{job.usage()}.]}
+\caption{Poraba procesorskega časa. Vsak del je en posel, 1000 posnetkov na vezje. Ocena je za prvi preizkus od IBM, za pilot po enačbi~\eqref{g20:eq:cas}, za naslednje dele pa z izmerjenimi 0,284~ms na posnetek. Dejansko je obračun IBM (\texttt{job.usage()}).}
 \label{g20:tab:cas}
 \centering
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrrl}
 \toprule
-Del poskusa & vezja & posli & ocena [s] & dejansko [s] \\
+Del poskusa & vezja & ocena [s] & dejansko [s] & job ID \\
 \midrule
-prvi preizkus (5 kubitov) & 1 & 1 & 2,3 & 2 \\
-pilotni zagon & 88 & 1 & 32,8 & [ ] \\
-glavni zagon & 148 & 1 & 53,8 & [ ] \\
-zgostitev (po potrebi) & $\le 48$ & 1 & $\le 18{,}8$ & [ ] \\
+prvi preizkus (5 kubitov) & 1 & 2,3 & 2 & \texttt{\footnotesize dbk48fl6p51s73clupeg} \\
+pilotni zagon & 88 & 32,8 & 25 & \texttt{\footnotesize dbm885pkbkrc73cp1isg} \\
+glavni zagon & 148 & 44,0 & 41 & \texttt{\footnotesize dbm8avm74qds73drqldg} \\
+zgostitev & 88 & 27,0 & 25 & \texttt{\footnotesize dbm8fh58mdtc73d7gb20} \\
+dodatni posel & 68 & 21,3 & 20 & \texttt{\footnotesize dbm8k458mdtc73d7ggeg} \\
 \midrule
-skupaj & $\le 285$ & $\le 4$ & $\le 107{,}7$ & [ ] \\
+skupaj & 393 & 127,4 & 113 & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Metrike}
-\label{g20:sec:metrike}
-
-\begin{itemize}
-\item zvestoba $F$, populacija $P$ in koherenca $C$ v odvisnosti od $N$ (enačbi~\eqref{g20:eq:zvestoba} in~\eqref{g20:eq:pariteta}),
-\item $F$ surovo in z ublažitvijo branja, $N_{\max}$ za vsako konfiguracijo in prirastek $\Delta N_{\max}$ zaradi zasnove
-      vezja, DD oziroma ublažitve branja,
-\item razlika $F$ med procesorjem, šumnim simulatorjem in klasičnim modelom,
-\item globina vezja in število dvokubitnih vrat pred prevajanjem in po njem, trajanje prevedenega vezja,
-\item porabljen procesorski čas na konfiguracijo.
-\end{itemize}
 
 
 \section{Rezultati}
 \label{g20:sec:rezultati}
 
 \textbf{Prvi preizkus na procesorju.} 2.\,11.\,2026 smo na ibm\_fez pognali 5-kubitno linearno verigo
-(1000 posnetkov, job ID \texttt{dbk48fl6p51s73clupeg}). Po prevajanju je imelo vezje globino 20 in 4 vrata CZ. Porazdelitev
-izidov je na sliki~\ref{g20:fig:ghz5}: $P = 0{,}460 + 0{,}395 = 0{,}855$. Asimetrija med $\ket{00000}$ in $\ket{11111}$ je
+(1000 posnetkov, job ID \texttt{dbk48fl6p51s73clupeg}). Po prevajanju je imelo vezje globino 20 in 4 vrata CZ. Izidi dajo
+$P = 0{,}460 + 0{,}395 = 0{,}855$. Asimetrija med $\ket{00000}$ in $\ket{11111}$ je
 pričakovana, ker se kubit v stanju $\ket{1}$ med čakanjem na branje lahko sprosti v $\ket{0}$. Koherence $C$ v tem preizkusu
-še nismo merili, zato zvestobe še ne poznamo.
+nismo merili, zato zvestobe za to točko ne poznamo.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{ghz5_ibm}
-\caption{Porazdelitev izidov 5-kubitnega stanja GHZ na procesorju ibm\_fez (1000 posnetkov). Izidi z manj kot 5 zadetki so
-združeni v stolpec \enquote{ostali}. Sliko izriše \texttt{src/izris\_ghz5.py}.}
-\label{g20:fig:ghz5}
-\end{figure}
 
 \textbf{Ponovitev na šumnem simulatorju.} Fizični kubiti zagona z 2.\,11.\,2026 niso bili zabeleženi, zato smo enako vezje
 (1000 posnetkov) simulirali na najboljši verigi FakeFez (kubiti 141, 142, 143, 136, 123) in na 10 naključnih verigah
 (\texttt{rezultati/sim/ponovitev\_B0.json}). Prevedeno vezje ima tudi tu globino 20 in 4 vrata CZ. Najboljša veriga da
 $P=0{,}948\pm0{,}007$, naključne pa $P=0{,}842$--$0{,}923$; ibm\_fez s $P=0{,}855$ leži na spodnjem robu tega razpona.
-[Razlaga: postavitev kubitov na ibm\_fez ni znana, kalibracija FakeFez je s 24.\,2.\,2025.]
+Natančnejša primerjava ni mogoča, ker postavitev kubitov tega zagona ni znana, kalibracija FakeFez pa je s 26.\,2.\,2025.
 
 \textbf{Klasični model proti šumni simulaciji.} Tabela~\ref{g20:tab:model} primerja napoved modela
 (razdelek~\ref{g20:sec:model}) s šumno simulacijo verige na FakeFez. Razlika je največ 0,016; model je v petih od šestih
-primerov nekoliko višji od simulacije. [Razlaga odstopanja: \ ] [Točki $N=10$ in 13 shrani v \texttt{rezultati/sim/}.]
+primerov nekoliko višji od simulacije. [Točki $N=10$ in 13 shrani v \texttt{rezultati/sim/}.]
 
 \begin{table}[htbp]
 \caption{Zvestoba verige na FakeFez: klasični model proti šumni simulaciji (MPS).}
@@ -375,48 +351,189 @@ $N$ & model & simulacija & model & simulacija \\
 \end{tabular}
 \end{table}
 
-[Tukaj pridejo: (1) tabela lastnosti vezij za vse $N$ in obe zasnovi; (2) graf $F(N)$ za idealni simulator, FakeFez,
-klasični model in ibm\_fez, vse 4 konfiguracije, z vodoravno črto pri $F=0{,}5$; (3) tabela $N_{\max}$ po konfiguracijah;
-(4) primerjava z objavami~\cite{g20:wei2020, g20:mooney2021, g20:ibm2025bigcats}.]
+\subsection{Zvestoba na procesorju ibm\_fez}
+\label{g20:sec:rez-qpu}
+
+Slika~\ref{g20:fig:fn} kaže $F(N)$ za obe zasnovi, tabela~\ref{g20:tab:zvestobe} vse izmerjene vrednosti, tabela~\ref{g20:tab:vezja}
+pa lastnosti vezij. Vrednosti $P$ in $C$ po točkah so v \texttt{rezultati/qpu/}. Na idealnem simulatorju dasta obe zasnovi $F=1$
+(samodejni testi). Šumno simulacijo imamo le do $N=13$ (tabela~\ref{g20:tab:model}), zato pri velikih $N$ meritve primerjamo z modelom.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{ghz_fn}
+\caption{Zvestoba stanja GHZ na ibm\_fez v odvisnosti od $N$. Navpične črte so $\pm2\sigma_F$; točki brez in z DD sta za berljivost malo razmaknjeni. Črte so napoved klasičnega modela iz objavljene kalibracije na dan meritve. Križci so postavitve $^a$ s kubitom 113 po poslabšanju njegovega branja; v $N_{\max}$ jih ne štejemo. Sliko izriše \texttt{src/izris\_rezultatov.py}.}
+\label{g20:fig:fn}
+\end{figure}
+
+\begin{table}[htbp]
+\caption{Izmerjena zvestoba na ibm\_fez; v oklepaju je $\sigma_F$ v enotah zadnjega mesta. Postavitev $^a$ vsebuje kubit 113 po poslabšanju branja, postavitev $^b$ ne vsebuje kubitov 113 in 131. Model: objavljena kalibracija na dan meritve.}
+\label{g20:tab:zvestobe}
+\centering
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+& & \multicolumn{2}{c}{surovo} & \multicolumn{2}{c}{ublaženo} & \multicolumn{2}{c}{model} \\
+zasnova & $N$ & brez DD & z DD & brez DD & z DD & surovo & ublaž. \\
+\midrule
+veriga & 10 & 0,788(8) & 0,783(9) & 0,897(11) & 0,892(12) & 0,834 & 0,928 \\
+veriga & 16 & 0,520(10) & 0,543(9) & 0,771(18) & 0,813(16) & 0,671 & 0,861 \\
+veriga & 19 & 0,432(11) & 0,381(11) & 0,571(17) & 0,510(16) & 0,622 & 0,807 \\
+veriga & 22 & 0,410(11) & 0,392(11) & 0,619(18) & 0,603(18) & 0,528 & 0,764 \\
+veriga & 25 & 0,340(11) & 0,373(11) & 0,606(23) & 0,708(24) & 0,467 & 0,724 \\
+veriga & 28 & 0,234(12) & 0,201(9) & 0,441(25) & 0,397(22) & 0,411 & 0,641 \\
+veriga & 34 & 0,237(10) & 0,220(10) & 0,415(24) & 0,447(25) & 0,315 & 0,569 \\
+\midrule
+drevo & 20 & 0,562(10) & 0,562(10) & 0,795(17) & 0,790(16) & 0,660 & 0,918 \\
+drevo & 25$^{a}$ & 0,278(10) & 0,293(10) & 0,905(48) & 0,967(47) & 0,562 & 0,895 \\
+drevo & 25$^{b}$ & 0,522(11) & 0,507(11) & 0,764(18) & 0,735(17) & 0,602 & 0,890 \\
+drevo & 30 & 0,396(11) & 0,392(10) & 0,713(21) & 0,700(21) & 0,523 & 0,868 \\
+drevo & 40 & 0,264(11) & 0,271(10) & 0,556(28) & 0,616(27) & 0,366 & 0,786 \\
+drevo & 46 & 0,194(10) & 0,218(11) & 0,552(39) & 0,672(43) & 0,324 & 0,776 \\
+drevo & 50 & 0,193(9) & 0,197(10) & 0,697(49) & 0,711(52) & 0,268 & 0,768 \\
+drevo & 50$^{b}$ & 0,174(10) & 0,183(11) & 0,575(49) & 0,627(48) & 0,204 & 0,687 \\
+drevo & 53$^{a}$ & 0,067(9) & 0,065(8) & 0,748(217) & 0,748(211) & 0,162 & 0,688 \\
+drevo & 53$^{b}$ & 0,138(10) & 0,129(9) & 0,476(57) & 0,504(57) & 0,181 & 0,669 \\
+drevo & 56 & 0,120(9) & 0,108(9) & 0,485(71) & 0,392(67) & 0,153 & 0,620 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Lastnosti vezij: globina pred prevajanjem (populacijsko vezje) in po njem (paritetno vezje v vratih procesorja), število dvokubitnih vrat po prevajanju, trajanje, povprečna napaka branja po objavljeni kalibraciji in izmerjena v istem poslu, $(e_0+e_1)/2$, povprečna objavljena napaka dvokubitnih vrat in $T_2$.}
+\label{g20:tab:vezja}
+\centering
+\footnotesize
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+& & \multicolumn{2}{c}{globina} & & trajanje & \multicolumn{2}{c}{napaka branja} & napaka & $T_2$ \\
+zasnova & $N$ & pred & po & 2q & [$\mu$s] & IBM & izmerjena & 2q & [$\mu$s] \\
+\midrule
+veriga & 10 & 11 & 43 & 9 & 2,56 & 0,0072 & 0,0087 & 0,0028 & 137 \\
+veriga & 16 & 17 & 67 & 15 & 3,09 & 0,0107 & 0,0162 & 0,0027 & 107 \\
+veriga & 19 & 20 & 79 & 18 & 3,36 & 0,0096 & 0,0113 & 0,0039 & 114 \\
+veriga & 22 & 23 & 91 & 21 & 3,64 & 0,0119 & 0,0139 & 0,0033 & 118 \\
+veriga & 25 & 26 & 103 & 24 & 3,94 & 0,0126 & 0,0163 & 0,0030 & 121 \\
+veriga & 28 & 29 & 115 & 27 & 4,19 & 0,0117 & 0,0169 & 0,0044 & 94 \\
+veriga & 34 & 35 & 139 & 33 & 4,74 & 0,0137 & 0,0150 & 0,0024 & 105 \\
+\midrule
+drevo & 20 & 9 & 27 & 19 & 2,28 & 0,0112 & 0,0117 & 0,0025 & 107 \\
+drevo & 25$^{a}$ & 9 & 29 & 24 & 2,30 & 0,0126 & 0,0231 & 0,0024 & 96 \\
+drevo & 25$^{b}$ & 10 & 30 & 24 & 2,37 & 0,0107 & 0,0103 & 0,0024 & 104 \\
+drevo & 30 & 10 & 30 & 29 & 2,37 & 0,0116 & 0,0133 & 0,0028 & 100 \\
+drevo & 40 & 14 & 40 & 39 & 2,69 & 0,0136 & 0,0144 & 0,0027 & 103 \\
+drevo & 46 & 12 & 41 & 45 & 2,58 & 0,0136 & 0,0166 & 0,0028 & 108 \\
+drevo & 50 & 12 & 39 & 49 & 2,56 & 0,0152 & 0,0177 & 0,0028 & 112 \\
+drevo & 50$^{b}$ & 13 & 39 & 49 & 2,62 & 0,0177 & 0,0170 & 0,0052 & 114 \\
+drevo & 53$^{a}$ & 13 & 39 & 52 & 2,62 & 0,0202 & 0,0265 & 0,0046 & 106 \\
+drevo & 53$^{b}$ & 14 & 43 & 52 & 2,72 & 0,0182 & 0,0173 & 0,0050 & 103 \\
+drevo & 56 & 13 & 41 & 55 & 2,62 & 0,0185 & 0,0189 & 0,0080 & 108 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Interval za $N_{\max}$ po kriteriju $F-2\sigma_F>0{,}5$ brez postavitev $^a$ in napoved modela iz kalibracije FakeFez.}
+\label{g20:tab:nmax}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Konfiguracija & brez DD & z DD & model \\
+\midrule
+veriga, surovo & 10--16 & 16--19 & 26 \\
+veriga, z ublažitvijo branja & 25--28 & 25--28 & 33 \\
+drevo, surovo & 25--30 & 20--25 & 33 \\
+drevo, z ublažitvijo branja & 50--53 & 50--53 & 70 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Meja $N_{\max}$.} Razlik med stolpcema tabele~\ref{g20:tab:nmax} brez ublažitve ne pripisujemo DD, ker sta točki na samem
+pragu: $F-2\sigma_F$ je pri verigi $N=16$ enak 0,499 brez DD in 0,525 z DD, pri drevesu $N=25^b$ pa 0,5005 in 0,486. Zato brez
+ublažitve navajamo $N_{\max}\approx 16$ za verigo in $N_{\max}\approx 25$ za drevo. $F$ z $N$ ne pada monotono, ker se postavitev kubitov
+spreminja: veriga z ublažitvijo in DD kriterija ne izpolni pri $N=19$ (0,478), izpolni pa ga pri $N=22$ in 25; drevo z ublažitvijo
+brez DD ga ne izpolni pri $N=46$ (0,475). Pri drevesu $N=50$ je z ublažitvijo izpolnjen v treh od štirih meritev (0,599 in 0,608 na
+prvi postavitvi, 0,476 in 0,530 na postavitvi $^b$), pri $N=53^b$ in $N=56$ pa v nobeni.
+
+\textbf{Sprememba napake branja med posli.} Kalibracijska vezja vsakega posla dajo napako branja po kubitih
+(\texttt{src/preveri\_branje.py}). Kubit 113 je imel v poslu, oddanem ob 14:26, $e_0=0{,}065$ in $e_1=0{,}076$, v poslu ob 14:32 0,063 in 0,080, v poslu ob 14:42 pa
+0,462 in 0,215. Kubit 131 se je med zadnjima meritvama poslabšal z 0,066 in 0,068 na 0,181 in 0,136, kubit 105 pa izboljšal z 0,122 in
+0,100 na 0,017 in 0,024. Objavljena kalibracija tega ni pokazala: objavljene napake branja vseh 25 kubitov postavitve $25^a$ dajo
+vsoto 0,316, izmerjeno povprečje samega kubita 113 pa je 0,339. Postavitev $25^a$ vsebuje kubit 113, postavitev $53^a$ oba kubita. Surovi $F$ pri
+$N=25^a$ (0,278 in 0,293) je zato manjši kot pri $N=30$, ublaženi (0,905 in 0,967) je nad trendom, kar kaže na preveliko
+korekcijo, pri $N=53^a$ pa je $\sigma_F$ kar 0,21--0,22. Dodatni posel brez teh dveh kubitov da $0{,}522\pm0{,}011$ surovo in
+$0{,}764\pm0{,}018$ ublaženo pri $N=25^b$ ter $\sigma_F=0{,}057$ pri $N=53^b$. Veriga $N=25$ vsebuje kubit 131, zato je njena izmerjena napaka branja večja od objavljene (0,0163 proti 0,0126). Obdržimo jo, ker je poslabšanje zmerno in ublažitev uporablja kalibracijo istega posla, vendar meja verige 25--28 sloni tudi na tej točki.
+
+\textbf{Preverba ublažitve branja.} Pri $N=50$ ublažitev poveča $F$ z 0,193 na 0,697, ker je $\prod_i(1-e_{0,i}-e_{1,i})$ le 0,155. Zato smo
+na kalibracijskih izidih preverili neodvisnost napak: verjetnost izida vseh ničel oziroma vseh enic se ujema s produktom po
+kubitih (razmerje 0,99--1,02 brez postavitev $^a$, znotraj statistične negotovosti), pariteta pa v okviru približno dveh standardnih odklonov. Moč preverbe je
+pri velikih $N$ majhna, saj je negotovost razmerja paritete stanja enic pri $N\ge46$ 11--31~\%, zajame pa le stanji vseh ničel in
+vseh enic.
+
+\textbf{Dinamično razklapljanje.} V 36 primerjavah (18 postavitev, surovo in ublaženo) je $F$ z DD v 18 primerih večji in v 18
+manjši, $z$ pa je med $-3{,}2$ in $+3{,}0$. Primerjave niso neodvisne, ker surova in ublažena vrednost izhajata iz istih izidov, pri
+ublaženih je $z$ konzervativen, ker para delita kalibracijo. Vzorec se pokaže šele, ko $F$ razstavimo: pri verigi DD zmanjša $P$ na vseh
+sedmih točkah (pri $N\ge19$ za 0,05--0,10, $z$ od $-2{,}3$ do $-4{,}8$) in poveča $C$ na petih (največ za 0,123 pri $N=25$, $z=5{,}6$),
+zato se učinka v $F$ približno izničita. Pri drevesu je vzorec šibkejši: $C$ izraziteje zraste le pri $N=40$ in 46 ($z=3{,}1$ in $2{,}0$).
+
+\textbf{Primerjava z modelom.} Model je na vseh točkah nad meritvijo (brez postavitev $^a$): razlika je 0,02--0,24 surovo in 0,02--0,30 z
+ublažitvijo. Izmerjena napaka branja je do 1,5-krat večja od objavljene (tabela~\ref{g20:tab:vezja}), pri treh postavitvah pa malo
+manjša, kar razloži le del surove razlike in ne razlike z ublažitvijo. Model upošteva objavljene napake in neodvisna čakanja; katere
+napake manjkajo, iz teh meritev ne moremo ločiti.
+
+\textbf{Primerjava z objavami.} Drevo $N=25^b$ doseže brez ublažitve $F=0{,}522\pm0{,}011$, kar je v okviru negotovosti enako kot 18-kubitno stanje z
+$F=0{,}517$~\cite{g20:wei2020}, le pri več kubitih. Z ublažitvijo branja, kot v~\cite{g20:mooney2021} (27 kubitov, $F=0{,}546$), doseže drevo pri $N=30$
+$F=0{,}713\pm0{,}021$, pri $N=50$ pa 0,575--0,711. Rekord 120 kubitov z $F=0{,}56$~\cite{g20:ibm2025bigcats} uporablja tehnike, ki jih
+nismo uporabili. Procesorji so različni, zato razlika meri tudi napredek strojne opreme, ne le metode.
 
 
 \section{Razprava}
 \label{g20:sec:razprava}
 
-[Odgovor na raziskovalno vprašanje: ali se je hipoteza potrdila? Kateri vzvod (zasnova vezja, DD, ublažitev branja) je meji
-najbolj pomagal in zakaj? Kako dobro je šumni model FakeFez napovedal rezultat procesorja?]
+\textbf{Odgovor na raziskovalno vprašanje.} Procesor ibm\_fez z vezji in ublažitvijo, dostopnimi vsakomur, pripravi stanje GHZ z $F>0{,}5$
+do $N\approx16$ z verigo in $N\approx25$ z drevesom brez ublažitve ter do 25--28 oziroma 50--53 z ublažitvijo branja. Zasnova vezja mejo
+premakne za približno 9 kubitov brez ublažitve in približno 25 z njo, ublažitev branja za približno 9 pri verigi in približno 25 pri
+drevesu, DD pa je ne premakne. Vzvoda se krepita, saj ublažitev pri drevesu prinese več kot pri verigi. Po modelu faktor čakanja $D$ pri drevesu ne pade pod 0,83, pri verigi pa pade na
+0,42 pri $N=34$, ker vezje traja do 4,7~$\mu$s namesto do 2,7~$\mu$s. Ublažitev branja čakanj ne popravi, zato po modelu verigo ustavijo čakanja, pri
+drevesu pa je glavna omejitev branje, ki ga ublažitev popravi. Ker je model nad meritvami, je to razlaga in ne meritev.
 
-\textbf{Omejitve.} [Npr.: kalibracija procesorja se med dnevi spreminja; omejen procesorski čas dovoljuje le eno
-ponovitev; ublažitev branja popravi branje, ne pa napak med pripravo stanja.]
+\textbf{Ali se je napoved potrdila?} Vrstni red se je potrdil: drevo je boljše od verige, ublažitev dvigne mejo. Velikosti se niso: vse
+meje so pod napovedmi 26, 33, 33 in 70. Napoved, da DD bolj pomaga verigi, se je potrdila le za $C$, saj padec $P$ dobitek izniči. Zakaj $P$
+z DD pade, nismo preverili; možna razlaga je, da k napakam prispevajo dodatni impulzi X.
+
+\textbf{Kaj rezultat pomeni.} Prava večdelna prepletenost je neposredno pokazana le brez ublažitve, torej do $N\approx25$. Pri $N\approx50$ je
+surovi $F\approx0{,}19$, ublažena vrednost pa velja ob predpostavki neodvisnih napak branja, ki smo jo lahko preverili le omejeno.
+
+\textbf{Omejitve.} Vsi štirje glavni posli so bili v 26 minutah enega dne, kalibracija procesorja pa se spreminja, kot kaže kubit 113. Ponovili smo le
+$N=25, 50, 53$ in še to z drugo postavitvijo, zato razpršenosti med dnevi ne poznamo. Meja je odvisna od postavitve: $F$ z ublažitvijo pri $N=50$ je
+0,697 in 0,711 na prvi ter 0,575 in 0,627 na drugi, postavitev $N=56$ pa ima povprečno napako dvokubitnih vrat 0,0080 namesto 0,0024--0,0028
+pri drevesih do $N=50$ (razen postavitve $50^b$). Kalibracijska vezja so na začetku posla, zato spremembe med poslom ne zaznamo. Ublažitev popravi branje, ne pa napak
+med pripravo stanja. Šumno simulacijo imamo le do $N=13$.
 
 \subsection{Kaj ni delovalo}
 \label{g20:sec:neuspehi}
 
-[Opomba za skupino: zahtevan je vsaj en neuspešen poskus; izberemo enega ali dva od spodnjih in dodamo morebitne s procesorja.]
+\textbf{Izbira kubitov iz objavljene kalibracije.} Izbira je vključila kubit 113 tudi po tem, ko se je njegovo branje poslabšalo, ker
+objavljena kalibracija tega ni pokazala. Zato sta bili dve od štirih točk zgostitve neuporabni za $N_{\max}$ in smo potrebovali dodatni
+posel (20~s). Rešitev sta možnost \texttt{-{}-brez-kubitov} in napaka branja, izmerjena v vsakem poslu.
+
+\textbf{Točki $N=64$ in 76.} Izbrali smo ju po napovedi modela, da je meja drevesa blizu 70. Pilot je pokazal, da je precej nižja, zato smo ju
+pred glavnim zagonom nadomestili z $N=46$ in 56. Brez pilota bi ju izmerili daleč pod pragom.
 
 \textbf{Simulacija MPS je obtičala.} Simulacija 27-kubitnega stanja GHZ s šumnim modelom FakeMontrealV2 se ni nikoli končala
 in ni javila napake. Prožilo jo je termično sproščanje v dvokubitnem kanalu Krausa pri vratih CX, pojavljala pa se je šele pri
 več posnetkih (pri 200 posnetkih je delovala, pri 4000 ne). Rešitev sta Paulijev približek napake dvokubitnih vrat in
-dodajanje napak branja po simulaciji (razdelek~\ref{g20:sec:model}). Na FakeFez je približek 5-kubitni $F$ spremenil le z
-0,978 na 0,974 [izid ni shranjen: ponovi ali številki izbriši].
+dodajanje napak branja po simulaciji (razdelek~\ref{g20:sec:model}).
 
-\textbf{Simetrične napake branja.} Aerov šumni model napako branja kubita hrani kot povprečje $p(1\,|\,0)$ in $p(0\,|\,1)$,
-zato simulacija ni kazala asimetrije med $\ket{0\dots0}$ in $\ket{1\dots1}$, ki smo jo videli na ibm\_fez (460 proti 395
-zadetkov). Zdaj obe verjetnosti beremo iz kalibracije procesorja vsako posebej.
-
-\textbf{Ponovitev objav na simulatorjih starih procesorjev.} Načrtovali smo tudi ponovitev rezultatov~\cite{g20:wei2020, g20:mooney2021} na šumnih modelih takratnih procesorjev (FakeMontrealV2 in 20-kubitni modeli). Dolge simulacije na vseh jedrih so prenosnik večkrat pregrele do izklopa. Ponovitvi smo opustili, ker za raziskovalno vprašanje nista potrebni: z objavami neposredno primerjamo naše točke na ibm\_fez pri $N=20$--$30$.
-
-\textbf{Poraba 0~s.} Naša prva skripta za preverjanje dostopa je po prvem zagonu izpisala porabo 0~s, ker je porabo prebrala,
-preden jo je IBM obračunal; dejanska poraba je bila 2~s. Enaka past bi pokvarila tudi proračun: če bi porabo šteli sproti,
-bi lahko oddali več, kot smo dogovorili. Zato \texttt{src/qpu.py} vsakemu poslu vnaprej rezervira njegovo največje trajanje in
-rezervacijo sprosti šele po obračunu (razdelek~\ref{g20:sec:orodja}).
 
 
 \section{Zaključek}
 \label{g20:sec:zakljucek}
 
-[Glavni rezultat v nekaj stavkih in predlog nadaljnjega dela, npr.\ dinamična vezja z meritvami sredi vezja, ki omogočajo
-pripravo GHZ v konstantni globini.]
+Na procesorju ibm\_fez smo s 113~s procesorskega časa izmerili mejo stanj GHZ: $N_{\max}\approx16$ za verigo in $\approx25$ za drevo brez
+ublažitve ter 25--28 in 50--53 z ublažitvijo branja. Največ prinese zasnova vezja skupaj z ublažitvijo branja, DD meje ne premakne,
+klasični model iz objavljene kalibracije pa meje precenjuje. Objavljena kalibracija lahko zamuja, saj je branje enega kubita v približno desetih minutah
+poskočilo z 0,06 na 0,46. Za nadaljnje delo predlagamo kratko merjenje napak branja tik pred izbiro kubitov in dinamična vezja z meritvami
+sredi vezja~\cite{g20:baumer2024}, ki omogočajo pripravo stanja GHZ v konstantni globini.
 
 
 \section*{Doprinosi avtorjev}
